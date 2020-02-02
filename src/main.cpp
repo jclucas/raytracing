@@ -3,6 +3,8 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+#include "camera.h"
+
 using namespace std;
 
 int main() {
@@ -11,14 +13,10 @@ int main() {
     const int height = 800;
     const int width = 1280;
 
-    // init framebuffer
-    glm::vec3 *frame = (glm::vec3*) malloc(height * width * sizeof(glm::vec3));
+    Camera camera = Camera(glm::vec3(0, 0, 0), glm::vec3(1, 0, 0), glm::vec3(0, 0, 1));
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            frame[i*width + j] = glm::vec3(float(i) / float(height), float(j) / float(width), 0.0f);
-        }
-    }
+    // init framebuffer
+    glm::vec3 *frame = camera.render(height, width, Scene());
 
     // save to ppm
     ofstream file;
@@ -31,6 +29,7 @@ int main() {
         file << pixel.x << " " << pixel.y << " " << pixel.z << "\n";
     }
 
+    delete[] frame;
     file.close();
 
 }
