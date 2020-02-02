@@ -1,0 +1,9 @@
+.vscode
+
+# build output
+out
+*.slo
+*.lo
+*.o
+*.obj
+*.exe
