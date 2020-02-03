@@ -13,10 +13,19 @@ int main() {
     const int height = 800;
     const int width = 1280;
 
-    Camera camera = Camera(glm::vec3(0, 0, 0), glm::vec3(1, 0, 0), glm::vec3(0, 0, 1));
+    // scene characteristics
+    const glm::vec3 background = glm::vec3(0, 0.5, 1);
 
-    // init framebuffer
-    glm::vec3 *frame = camera.render(height, width, Scene());
+    // set up scene
+    Scene scene = Scene(background);
+    Sphere *sphere = new Sphere(glm::vec3(0, 0, 4), 1.0f, glm::vec3(0.8f, 0.8f, 0.8f));
+    scene.add(*sphere);
+
+    // set up camera
+    Camera camera = Camera(glm::vec3(0, 0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1));
+
+    // render
+    glm::vec3 *frame = camera.render(height, width, scene);
 
     // save to ppm
     ofstream file;
