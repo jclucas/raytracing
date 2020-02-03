@@ -18,11 +18,11 @@ int main() {
 
     // set up scene
     Scene scene = Scene(background);
-    Sphere *sphere = new Sphere(glm::vec3(0, 0, 4), 1.0f, glm::vec3(0.8f, 0.8f, 0.8f));
+    Sphere *sphere = new Sphere(glm::vec3(0, 1, 4), 1.0f, glm::vec3(0.8f, 0.8f, 0.8f));
     scene.add(*sphere);
 
     // set up camera
-    Camera camera = Camera(glm::vec3(0, 0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, 1));
+    Camera camera = Camera(glm::vec3(0, 0, -1), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0));
 
     // render
     glm::vec3 *frame = camera.render(height, width, scene);
