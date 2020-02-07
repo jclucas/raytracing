@@ -50,14 +50,14 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
     float h = w * aspect;
 
     // amount to step in camera space between pixels
-    float step = w / width;
+    float step = -w / width;
     glm::vec4 dw = glm::vec4(step, 0, 0, 0);
     glm::vec4 dh = glm::vec4(0, step, 0, 0);
     
     // upper left corner ray
     glm::vec4 ul = glm::vec4(center, 0);
     ul -= float(width) / 2 * dw;
-    ul += float(height) / 2 * dh;
+    ul -= float(height) / 2 * dh;
 
     // cout << "ul: " << ul.x << " " << ul.y << " " << ul.z <<endl;
     // cout << "dw: " << dw.x << " " << dw.y << " " << dw.z <<endl;
@@ -66,7 +66,7 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
     glm::vec3 dir;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            dir = glm::normalize(glm::vec3(ul + dw * float(j) - dh * float(i)));
+            dir = glm::normalize(glm::vec3(ul + dw * float(j) + dh * float(i)));
             frame[i*width + j] = scene.cast(position, dir);
         }
     }

@@ -5,7 +5,6 @@ class Object {
 
     protected:
         glm::vec3 position;
-        glm::vec3 orientation;
 
         // just a rgb color for now
         glm::vec3 material;
@@ -24,19 +23,20 @@ class Sphere : public Object {
     
     public:
         Sphere(glm::vec3 position, float radius, glm::vec3 material);
-        void transform(glm::mat4 m);// : Object::transform(m);
         bool intersect(glm::vec3 origin, glm::vec3 direction);
 
 };
 
-class Plane : public Object {
+class Triangle : public Object {
 
     private:
-        float x;
-        float y;
+        glm::vec3 a;
+        glm::vec3 b;
+        glm::vec3 c;
 
     public:
-        Plane(glm::vec3 position, float x, float y, glm::vec3 normal, glm::vec3 material);
+        Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 material);
+        void transform(glm::mat4 m);
         bool intersect(glm::vec3 origin, glm::vec3 direction);
 
 };

@@ -19,10 +19,14 @@ int main() {
 
     // set up scene
     Scene scene = Scene(background);
+    Triangle *tri1 = new Triangle(glm::vec3(-25, -3, 0), glm::vec3(-25, 7, 0), glm::vec3(5, -3, 0), glm::vec3(1, 0.5f, 0));
+    Triangle *tri2 = new Triangle(glm::vec3(5, 7, 0), glm::vec3(-25, 7, 0), glm::vec3(5, -3, 0), glm::vec3(1, 0.5f, 0));
     Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, glm::vec3(0.8f, 0.8f, 0.8f));
     Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, glm::vec3(0.5f, 0.5f, 0.5f));
     scene.add(*sphere1);
     scene.add(*sphere2);
+    scene.add(*tri1);
+    scene.add(*tri2);
 
     // set up camera
     Camera camera = Camera(glm::vec3(10, 0, 2.5), glm::vec3(-1, 0, -glm::tan(glm::radians(5.0f))), glm::vec3(0, 0, 1));
