@@ -2,6 +2,7 @@
 
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/trigonometric.hpp>
 
 #include "camera.h"
 
@@ -18,11 +19,13 @@ int main() {
 
     // set up scene
     Scene scene = Scene(background);
-    Sphere *sphere = new Sphere(glm::vec3(0, 1, 4), 1.0f, glm::vec3(0.8f, 0.8f, 0.8f));
-    scene.add(*sphere);
+    Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, glm::vec3(0.8f, 0.8f, 0.8f));
+    Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, glm::vec3(0.5f, 0.5f, 0.5f));
+    scene.add(*sphere1);
+    scene.add(*sphere2);
 
     // set up camera
-    Camera camera = Camera(glm::vec3(0, 0, -1), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0));
+    Camera camera = Camera(glm::vec3(10, 0, 2.5), glm::vec3(-1, 0, -glm::tan(glm::radians(5.0f))), glm::vec3(0, 0, 1));
 
     // render
     glm::vec3 *frame = camera.render(height, width, scene);
