@@ -56,8 +56,8 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
     
     // upper left corner ray
     glm::vec4 ul = glm::vec4(center, 0);
-    ul -= float(width) / 2 * dw;
-    ul -= float(height) / 2 * dh;
+    ul -= (float(width) / 2 - 0.5f) * dw;
+    ul -= (float(height) / 2 - 0.5f) * dh;
 
     // cout << "ul: " << ul.x << " " << ul.y << " " << ul.z <<endl;
     // cout << "dw: " << dw.x << " " << dw.y << " " << dw.z <<endl;

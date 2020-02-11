@@ -11,6 +11,7 @@ using namespace std;
  */
 Scene::Scene(glm::vec3 background) {
     this->background = background;
+    this->lights = vector<Light*>();
     this->objects = vector<Object*>();
 }
 
@@ -24,6 +25,14 @@ void Scene::transform(glm::mat4 m) {
         (*i)->transform(m);
     }
 
+}
+
+/**
+ * Add a point light source to the scene.
+ * @param light the light source to add
+ */ 
+void Scene::add(Light &light) {
+    lights.push_back(&light);
 }
 
 /**

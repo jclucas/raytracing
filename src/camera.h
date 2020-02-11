@@ -7,8 +7,6 @@ class Camera {
 
     private:
         glm::vec3 position;
-        // glm::vec3 lookat;
-        // glm::vec3 up;
         glm::mat4 m;
         float fov;
         float length;
