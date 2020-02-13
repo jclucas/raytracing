@@ -11,7 +11,7 @@ class Object {
 
     public:
         virtual void transform(glm::mat4 m);
-        virtual bool intersect(glm::vec3 origin, glm::vec3 direction) = 0;
+        virtual float intersect(glm::vec3 origin, glm::vec3 direction) = 0;
         glm::vec3 getColor();
 
 };
@@ -23,7 +23,7 @@ class Sphere : public Object {
     
     public:
         Sphere(glm::vec3 position, float radius, glm::vec3 material);
-        bool intersect(glm::vec3 origin, glm::vec3 direction);
+        float intersect(glm::vec3 origin, glm::vec3 direction);
 
 };
 
@@ -37,6 +37,6 @@ class Triangle : public Object {
     public:
         Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 material);
         void transform(glm::mat4 m);
-        bool intersect(glm::vec3 origin, glm::vec3 direction);
+        float intersect(glm::vec3 origin, glm::vec3 direction);
 
 };

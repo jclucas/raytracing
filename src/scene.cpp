@@ -51,12 +51,17 @@ void Scene::add(Object &object) {
  */
 glm::vec3 Scene::cast(glm::vec3 origin, glm::vec3 direction) {
     
+    float dist;
+    float min = INFINITY;
+    glm::vec3 color = background;
+
     for (vector<Object*>::iterator i = objects.begin(); i != objects.end(); i++) {
-        if ((*i)->intersect(origin, direction)) {
-            return (*i)->getColor();
+        if (dist = (*i)->intersect(origin, direction) < min) {
+            min = dist;
+            color = (*i)->getColor();
         }
     }
 
-    return background;
+    return color;
 
 }

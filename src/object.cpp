@@ -24,7 +24,7 @@ Sphere::Sphere(glm::vec3 position, float radius, glm::vec3 material) {
     this->material = material;
 }
 
-bool Sphere::intersect(glm::vec3 origin, glm::vec3 direction) {
+float Sphere::intersect(glm::vec3 origin, glm::vec3 direction) {
     
     glm::vec3 dist = origin - position;
 
@@ -34,7 +34,8 @@ bool Sphere::intersect(glm::vec3 origin, glm::vec3 direction) {
 
     float discriminant = b * b - 4 * a * c;
 
-    return discriminant > 0;
+    // return distance if ray intersects
+    return (discriminant > 0) ? (sqrt(discriminant) - b) / (2 * a) : INFINITY;
 
 }
 
@@ -47,7 +48,7 @@ Triangle::Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 material) {
     this->material = material;
 }
 
-bool Triangle::intersect(glm::vec3 origin, glm::vec3 direction) {
+float Triangle::intersect(glm::vec3 origin, glm::vec3 direction) {
 
     glm::vec3 e1 = b - a;
     glm::vec3 e2 = c - a;
@@ -63,7 +64,11 @@ bool Triangle::intersect(glm::vec3 origin, glm::vec3 direction) {
     // distance, u, v
     glm::vec3 intersect = glm::vec3(glm::dot(q, e2), glm::dot(p, t), glm::dot(q, direction)) / glm::dot(p, e1);
 
-    return intersect.x >= 0 && intersect.y + intersect.z < 1 && intersect.y >= 0 && intersect.z >= 0;
+    if (intersect.x >= 0 && intersect.y + intersect.z < 1 && intersect.y >= 0 && intersect.z >= 0) {
+        return intersect.x;
+    } else {
+        return INFINITY;
+    }
 
 }
 
