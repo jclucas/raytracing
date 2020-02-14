@@ -46,9 +46,18 @@ int main() {
     file.open("render.ppm");
     file << "P3 " << width << " " << height << " 255\n";
 
+    // find maximum intensity component
+    float maxval = 1;
+    for (int i = 0; i < height * width; i++) {
+        if (frame[i].r > maxval) { maxval = frame[i].r; }
+        if (frame[i].g > maxval) { maxval = frame[i].g; }
+        if (frame[i].b > maxval) { maxval = frame[i].b; }
+    }
+
+    // write scaled pixel value
     glm::ivec3 pixel;
     for (int i = 0; i < height * width; i++) {
-        pixel = glm::floor(255.0f * glm::clamp(frame[i], 0.0f, 1.0f));
+        pixel = glm::floor(255.0f * frame[i] / maxval);
         file << pixel.x << " " << pixel.y << " " << pixel.z << "\n";
     }
 
