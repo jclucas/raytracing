@@ -58,7 +58,7 @@ glm::vec3 Scene::cast(glm::vec3 origin, glm::vec3 direction) {
     for (vector<Object*>::iterator i = objects.begin(); i != objects.end(); i++) {
         if (dist = (*i)->intersect(origin, direction) < min) {
             min = dist;
-            color = (*i)->getColor();
+            color = (*i)->getColor(origin + dist * direction, origin, direction);
         }
     }
 

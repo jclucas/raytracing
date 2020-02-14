@@ -17,12 +17,17 @@ int main() {
     // scene characteristics
     const glm::vec3 background = glm::vec3(0, 0.5, 1);
 
+    // create materials
+    Phong *reflective = new Phong(glm::vec3(0.8f), glm::vec3(1), 0.5f);
+    Phong *transparent = new Phong(glm::vec3(0.5f), glm::vec3(0.5f), 1);
+    Phong *floor = new Phong(glm::vec3(1, 0.5f, 0), glm::vec3(1), 1);
+
     // set up scene
     Scene scene = Scene(background);
-    Triangle *tri1 = new Triangle(glm::vec3(-25, -3, 0), glm::vec3(-25, 7, 0), glm::vec3(5, -3, 0), glm::vec3(1, 0.5f, 0));
-    Triangle *tri2 = new Triangle(glm::vec3(5, 7, 0), glm::vec3(-25, 7, 0), glm::vec3(5, -3, 0), glm::vec3(1, 0.5f, 0));
-    Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, glm::vec3(0.8f, 0.8f, 0.8f));
-    Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, glm::vec3(0.5f, 0.5f, 0.5f));
+    Triangle *tri1 = new Triangle(glm::vec3(-25, -3, 0), glm::vec3(-25, 7, 0), glm::vec3(5, -3, 0), floor);
+    Triangle *tri2 = new Triangle(glm::vec3(5, 7, 0), glm::vec3(5, -3, 0), glm::vec3(-25, 7, 0), floor);
+    Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, reflective);
+    Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, transparent);
     Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
     scene.add(*sphere1);
     scene.add(*sphere2);

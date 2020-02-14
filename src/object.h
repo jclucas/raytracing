@@ -1,18 +1,19 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
+#include "material.h"
+
 class Object {
 
     protected:
         glm::vec3 position;
-
-        // just a rgb color for now
-        glm::vec3 material;
+        Material *material;
 
     public:
         virtual void transform(glm::mat4 m);
         virtual float intersect(glm::vec3 origin, glm::vec3 direction) = 0;
-        glm::vec3 getColor();
+        virtual glm::vec3 getNormal(glm::vec3 point) = 0;
+        glm::vec3 getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction);
 
 };
 
@@ -22,8 +23,9 @@ class Sphere : public Object {
         float radius;
     
     public:
-        Sphere(glm::vec3 position, float radius, glm::vec3 material);
-        float intersect(glm::vec3 origin, glm::vec3 direction);
+        Sphere(glm::vec3 position, float radius, Material *material);
+        float intersect(glm::vec3 origin, glm::vec3 direction) override;
+        virtual glm::vec3 getNormal(glm::vec3 point) override;
 
 };
 
@@ -35,8 +37,9 @@ class Triangle : public Object {
         glm::vec3 c;
 
     public:
-        Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 material);
-        void transform(glm::mat4 m);
-        float intersect(glm::vec3 origin, glm::vec3 direction);
+        Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, Material *material);
+        void transform(glm::mat4 m) override;
+        float intersect(glm::vec3 origin, glm::vec3 direction) override;
+        virtual glm::vec3 getNormal(glm::vec3 point) override;
 
 };
