@@ -1,6 +1,7 @@
 #include <glm/geometric.hpp>
 
 #include "material.h"
+#include "light.h"
 
 /**
  * Create a Phong material.
@@ -22,8 +23,6 @@ Phong::Phong(glm::vec3 diffuse, glm::vec3 specular, float sharpness) {
  * @param v direction to viewer
  * @return intensity at point
  */
-glm::vec3 Phong::getColor(glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v) {
-
-    return 10.0f * diffuse * glm::dot(s, n); // + specular * powf(glm::dot(r, v), sharpness);
-
+glm::vec3 Phong::getColor(glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) {
+    return light.getRadiance() * (diffuse * glm::dot(s, n) + specular * powf(glm::max(glm::dot(r, v), 0.0f), sharpness));
 }

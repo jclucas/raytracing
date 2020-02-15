@@ -1,23 +1,40 @@
+#include <glm/vec3.hpp>
 #include <glm/geometric.hpp>
 #include <iostream>
 
+#include "scene.h"
 #include "object.h"
+#include "material.h"
+#include "light.h"
 
 using namespace std;
 
 // OBJECT
 
-glm::vec3 Object::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction) {
+glm::vec3 Object::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene) {
+
+    glm::vec3 color = glm::vec3(0);
+
     glm::vec3 n = getNormal(point);
     glm::vec3 v = glm::normalize(point - origin);
-    glm::vec3 s = glm::vec3(0, 10, 0);
-    glm::vec3 r = glm::reflect(s, n);
-    return material->getColor(n, v, s, r);
+    glm::vec3 s;
+    glm::vec3 r;
+
+    vector<Light*>* lights = scene.getLights();
+
+    for (vector<Light*>::iterator i = lights->begin(); i != lights->end(); i++) {
+        glm::vec3 s = glm::normalize(point - (*i)->getPosition());
+        // TODO: cast shadow ray
+        glm::vec3 r = glm::reflect(-s, n);
+        color += material->getColor(n, v, s, r, **i);
+    }
+    
+    return color;
+
 }
 
 void Object::transform(glm::mat4 m) {
     position = m * glm::vec4(position, 1);
-    // cout << "pos: " << position.x << " " << position.y << " " << position.z << endl;
 }
 
 // SPHERE
@@ -32,14 +49,14 @@ float Sphere::intersect(glm::vec3 origin, glm::vec3 direction) {
     
     glm::vec3 dist = origin - position;
 
-    float a = glm::dot(direction, direction);
+    // a is always 1 for normalized vectors
     float b = 2 * glm::dot(direction, dist);
     float c = glm::dot(dist, dist) - radius * radius;
 
-    float discriminant = b * b - 4 * a * c;
+    float discriminant = b * b - 4 * c;
 
     // return distance if ray intersects
-    return (discriminant > 0) ? (sqrt(discriminant) - b) / (2 * a) : INFINITY;
+    return (discriminant > 0) ? (sqrt(discriminant) - b) / 2 : INFINITY;
 
 }
 
@@ -49,7 +66,7 @@ float Sphere::intersect(glm::vec3 origin, glm::vec3 direction) {
  * @return normal vector
  */
 glm::vec3 Sphere::getNormal(glm::vec3 point) {
-    return glm::normalize(position - point);
+    return glm::normalize(point - position);
 }
 
 // TRIANGLE

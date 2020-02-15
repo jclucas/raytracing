@@ -4,7 +4,11 @@
 #include <glm/mat4x4.hpp>
 #include <glm/trigonometric.hpp>
 
+#include "scene.h"
 #include "camera.h"
+#include "object.h"
+#include "material.h"
+#include "light.h"
 
 using namespace std;
 
@@ -18,9 +22,9 @@ int main() {
     const glm::vec3 background = glm::vec3(0, 0.5, 1);
 
     // create materials
-    Phong *reflective = new Phong(glm::vec3(0.8f), glm::vec3(1), 0.5f);
-    Phong *transparent = new Phong(glm::vec3(0.5f), glm::vec3(0.5f), 1);
-    Phong *floor = new Phong(glm::vec3(1, 0.5f, 0), glm::vec3(1), 1);
+    Phong *reflective = new Phong(glm::vec3(0.8f), glm::vec3(1), 10.0f);
+    Phong *transparent = new Phong(glm::vec3(0.5f), glm::vec3(1), 10.0f);
+    Phong *floor = new Phong(glm::vec3(1, 0.5f, 0), glm::vec3(1), 10.0f);
 
     // set up scene
     Scene scene = Scene(background);

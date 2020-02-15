@@ -2,6 +2,8 @@
 #include <glm/vec3.hpp>
 
 #include "scene.h"
+#include "object.h"
+#include "light.h"
 
 using namespace std;
 
@@ -13,6 +15,11 @@ Scene::Scene(glm::vec3 background) {
     this->background = background;
     this->lights = vector<Light*>();
     this->objects = vector<Object*>();
+}
+
+
+vector<Light*>* Scene::getLights() {
+    return &lights;
 }
 
 /**
@@ -56,9 +63,9 @@ glm::vec3 Scene::cast(glm::vec3 origin, glm::vec3 direction) {
     glm::vec3 color = background;
 
     for (vector<Object*>::iterator i = objects.begin(); i != objects.end(); i++) {
-        if (dist = (*i)->intersect(origin, direction) < min) {
+        if ((dist = (*i)->intersect(origin, direction)) < min) {
             min = dist;
-            color = (*i)->getColor(origin + dist * direction, origin, direction);
+            color = (*i)->getColor(origin + dist * direction, origin, direction, *this);
         }
     }
 

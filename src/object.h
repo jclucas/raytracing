@@ -1,7 +1,8 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
-#include "material.h"
+class Material;
+class Scene;
 
 class Object {
 
@@ -13,7 +14,7 @@ class Object {
         virtual void transform(glm::mat4 m);
         virtual float intersect(glm::vec3 origin, glm::vec3 direction) = 0;
         virtual glm::vec3 getNormal(glm::vec3 point) = 0;
-        glm::vec3 getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction);
+        glm::vec3 getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene);
 
 };
 

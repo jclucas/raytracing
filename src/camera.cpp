@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include "scene.h"
 #include "camera.h"
 
 using namespace std;
