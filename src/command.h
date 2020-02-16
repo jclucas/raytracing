@@ -16,6 +16,7 @@ class CommandLine {
         unordered_map<string, Object*> objects;
         void list();
         void add(stringstream& args);
+        void render(stringstream& args);
 
     public:
         CommandLine();

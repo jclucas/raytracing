@@ -1,6 +1,10 @@
 #include <sstream>
+#include <fstream>
+#include <glm/mat4x4.hpp>
+#include <glm/trigonometric.hpp>
 
 #include "command.h"
+#include "camera.h"
 #include "light.h"
 #include "material.h"
 #include "object.h"
@@ -26,6 +30,8 @@ void CommandLine::parse(string& input) {
         list();
     } else if (cmd == "add") {
         add(args);
+    } else if (cmd == "render") {
+        render(args);
     } else {
         cout << "Command not recognized: " << input << endl;
     }
@@ -143,4 +149,49 @@ void CommandLine::add(stringstream& args) {
         cout << "Unknown type: " << type << endl;
     }
 
+}
+
+void CommandLine::render(stringstream& args) {
+
+    int height, width;
+    args >> height >> width;
+    
+    // set up camera
+    Camera camera = Camera(glm::vec3(10, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 0, 1));
+
+    // add lights
+    for (auto i = lights.begin(); i != lights.end(); i++) {
+        scene.add(*(i->second));
+    }
+
+    // add objects
+    for (auto i = objects.begin(); i != objects.end(); i++) {
+        scene.add(*(i->second));
+    }
+
+    // render
+    glm::vec3 *frame = camera.render(height, width, scene);
+
+    // save to ppm
+    ofstream file;
+    file.open("render.ppm");
+    file << "P3 " << width << " " << height << " 255\n";
+
+    // find maximum intensity component
+    float maxval = 1;
+    for (int i = 0; i < height * width; i++) {
+        if (frame[i].r > maxval) { maxval = frame[i].r; }
+        if (frame[i].g > maxval) { maxval = frame[i].g; }
+        if (frame[i].b > maxval) { maxval = frame[i].b; }
+    }
+
+    // write scaled pixel value
+    glm::ivec3 pixel;
+    for (int i = 0; i < height * width; i++) {
+        pixel = glm::floor(255.0f * frame[i] / maxval);
+        file << pixel.x << " " << pixel.y << " " << pixel.z << "\n";
+    }
+
+    delete[] frame;
+    file.close();
 }
