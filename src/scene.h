@@ -13,6 +13,7 @@ class Scene {
         vector<Object*> objects;
         glm::vec3 background;
     public:
+        Scene();
         Scene(glm::vec3 background);
         vector<Light*>* getLights();
         void transform(glm::mat4 m);

@@ -8,6 +8,15 @@
 using namespace std;
 
 /**
+ * Construct an empty scene with a default background.
+ */
+Scene::Scene() {
+    this->background = glm::vec3(0.5, 0.5, 0.5);
+    this->lights = vector<Light*>();
+    this->objects = vector<Object*>();
+}
+
+/**
  * Construct an empty scene.
  * @param background default radiance value
  */

@@ -1,14 +1,15 @@
+#include <iostream>
 #include <fstream>
 
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/trigonometric.hpp>
 
-#include "scene.h"
 #include "camera.h"
 #include "object.h"
 #include "material.h"
 #include "light.h"
+#include "command.h"
 
 using namespace std;
 
@@ -67,5 +68,23 @@ int main() {
 
     delete[] frame;
     file.close();
+
+    // COMMAND LINE LOOP
+
+    CommandLine cmd = CommandLine();
+    string input;
+
+    while (true) {
+
+        cout << "> ";
+        cin >> input;
+
+        if (input == "quit") {
+            return 0;
+        }
+
+        cmd.parse(input);
+        
+    }
 
 }
