@@ -2,6 +2,8 @@
 
 #include "command.h"
 #include "light.h"
+#include "material.h"
+#include "object.h"
 
 using namespace std;
 
@@ -73,20 +75,69 @@ void CommandLine::add(stringstream& args) {
 
     cout << "type: " << type << "\n";
     cout << "name: " << name << "\n";
-
+    
+    // temp vars for reading vectors
+    float a, b, c;
+    
     if (type == "light") {
-        float a, b, c;
+        
         args >> a >> b >> c;
         glm::vec3 position = glm::vec3(a, b, c);
         args >> a >> b >> c;
         glm::vec3 intensity = glm::vec3(a, b, c);
         args >> a;
         lights[name] = new Light(position, intensity, a);
+
     } else if (type == "material") {
 
+        args >> a >> b >> c;
+        glm::vec3 diffuse = glm::vec3(a, b, c);
+        args >> a >> b >> c;
+        glm::vec3 specular = glm::vec3(a, b, c);
+        args >> a;
+
+        materials[name] = new Phong(diffuse, specular, a);
+
     } else if (type == "sphere") {
+
+        args >> a >> b >> c;
+        glm::vec3 position = glm::vec3(a, b, c);
+        args >> a;
+
+        string mat;
+        args >> mat;
+        
+        try {
+            materials[mat];
+        }
+        catch (const std::out_of_range& e) {
+            cout << "Material not found: " << mat << endl;
+            return;
+        }
+
+        objects[name] = new Sphere(position, a, materials[mat]);
         
     } else if (type == "triangle") {
+
+        args >> a >> b >> c;
+        glm::vec3 p1 = glm::vec3(a, b, c);
+        args >> a >> b >> c;
+        glm::vec3 p2 = glm::vec3(a, b, c);
+        args >> a >> b >> c;
+        glm::vec3 p3 = glm::vec3(a, b, c);
+
+        string mat;
+        args >> mat;
+
+        try {
+            materials[mat];
+        }
+        catch (const std::out_of_range& e) {
+            cout << "Material not found: " << mat << endl;
+            return;
+        }
+
+        objects[name] = new Triangle(p1, p2, p3, materials[mat]);
 
     } else {
         cout << "Unknown type: " << type << endl;
