@@ -77,8 +77,8 @@ int main() {
     while (true) {
 
         cout << "> ";
-        cin >> input;
-
+        getline(cin, input);
+        
         if (input == "quit") {
             return 0;
         }

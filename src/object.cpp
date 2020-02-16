@@ -37,6 +37,18 @@ void Object::transform(glm::mat4 m) {
     position = m * glm::vec4(position, 1);
 }
 
+ostream& Object::print(ostream &s) const {
+    return s << "Object\n";
+}
+
+/**
+ * Output stream operator override.
+ */
+ostream& operator<<(ostream &s, Object *o) {
+    return o->print(s);
+}
+
+
 // SPHERE
 
 Sphere::Sphere(glm::vec3 position, float radius, Material *material) {
@@ -58,6 +70,16 @@ float Sphere::intersect(glm::vec3 origin, glm::vec3 direction) {
     // return distance if ray intersects
     return (discriminant > 0) ? (sqrt(discriminant) - b) / 2 : INFINITY;
 
+}
+
+/**
+ * Print function for output stream operator.
+ */
+ostream& Sphere::print(ostream &s) const {
+    return s << "Sphere\n"
+        << "position: (" << position.x << ", " << position.y << ", " << position.z << ")\n"
+        << "radius: " << radius << "\n"
+        << "material: " << "TODO" << endl;
 }
 
 /**
@@ -115,4 +137,15 @@ float Triangle::intersect(glm::vec3 origin, glm::vec3 direction) {
  */
 glm::vec3 Triangle::getNormal(glm::vec3 point) {
     return glm::normalize(glm::cross(a - b, a - c));
+}
+
+/**
+ * Print function for output stream operator.
+ */
+ostream& Triangle::print(ostream &s) const {
+    return s << "Sphere\n"
+        << "vertices: (" << a.x << ", " << a.y << ", " << a.z << "), "
+        << "(" << b.x << ", " << b.y << ", " << b.z << "), "
+        << "(" << c.x << ", " << c.y << ", " << c.z << ")\n"
+        << "material: " << "TODO" << endl;
 }
