@@ -28,8 +28,8 @@ int main() {
 
     // set up scene
     Scene scene = Scene(background);
-    Triangle *tri1 = new Triangle(glm::vec3(-25, -3, 0), glm::vec3(-25, 7, 0), glm::vec3(5, -3, 0), floor);
-    Triangle *tri2 = new Triangle(glm::vec3(5, 7, 0), glm::vec3(5, -3, 0), glm::vec3(-25, 7, 0), floor);
+    Triangle *tri1 = new Triangle(glm::vec3(-25, 7, 0), glm::vec3(-25, -3, 0), glm::vec3(5, -3, 0), floor);
+    Triangle *tri2 = new Triangle(glm::vec3(5, -3, 0), glm::vec3(5, 7, 0), glm::vec3(-25, 7, 0), floor);
     Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, reflective);
     Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, transparent);
     Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
@@ -61,7 +61,7 @@ int main() {
     // write scaled pixel value
     glm::ivec3 pixel;
     for (int i = 0; i < height * width; i++) {
-        pixel = glm::floor(255.0f * frame[i] / maxval);
+        pixel = glm::floor(255.0f * glm::max(glm::vec3(0), frame[i]) / maxval);
         file << pixel.x << " " << pixel.y << " " << pixel.z << "\n";
     }
 

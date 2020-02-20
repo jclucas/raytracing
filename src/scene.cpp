@@ -5,6 +5,8 @@
 #include "object.h"
 #include "light.h"
 
+#include <iostream>
+
 using namespace std;
 
 /**
@@ -32,6 +34,10 @@ void Scene::transform(glm::mat4 m) {
         (*i)->transform(m);
     }
 
+    for (vector<Light*>::iterator i = lights.begin(); i != lights.end(); i++) {
+        (*i)->transform(m);
+    }
+
 }
 
 /**
@@ -54,21 +60,38 @@ void Scene::add(Object &object) {
  * Cast a ray into the scene.
  * @param origin origin of the ray
  * @param direction direction of the ray
- * @return radiance value
+ * @return pointer to intersected object or null pointer
  */
-glm::vec3 Scene::cast(glm::vec3 origin, glm::vec3 direction) {
+Scene::Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
     
     float dist;
     float min = INFINITY;
-    glm::vec3 color = background;
+    int index = -1;
 
-    for (vector<Object*>::iterator i = objects.begin(); i != objects.end(); i++) {
-        if ((dist = (*i)->intersect(origin, direction)) < min) {
+    // intersect all objects
+    for (int i = 0; i < objects.size(); i++) {
+        if ((dist = objects[i]->intersect(origin, direction)) < min && dist > 0) {
             min = dist;
-            color = (*i)->getColor(origin + dist * direction, origin, direction, *this);
+            index = i;
         }
     }
 
-    return color;
+    // create return value
+    Scene::Hit hit;
+    hit.object = (index >= 0)? objects[index] : nullptr;
+    hit.point = origin + direction * min;
+    return hit;
+
+}
+
+glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction) {
+    
+    Scene::Hit hit = cast(origin, direction);
+    
+    if (hit.object == nullptr) {
+        return background;
+    } else {
+        return hit.object->getColor(hit.point, origin, direction, *this);
+    }
 
 }

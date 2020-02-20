@@ -24,5 +24,5 @@ Phong::Phong(glm::vec3 diffuse, glm::vec3 specular, float sharpness) {
  * @return intensity at point
  */
 glm::vec3 Phong::getColor(glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) {
-    return light.getRadiance() * (diffuse * glm::dot(s, n) + specular * powf(glm::max(glm::dot(r, v), 0.0f), sharpness));
+    return light.getRadiance() * (diffuse * glm::max(glm::dot(s, n), 0.0f) + specular * powf(glm::max(glm::dot(r, v), 0.0f), sharpness));
 }

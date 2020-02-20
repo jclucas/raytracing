@@ -16,17 +16,25 @@ glm::vec3 Object::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 directio
     glm::vec3 color = glm::vec3(0);
 
     glm::vec3 n = getNormal(point);
-    glm::vec3 v = glm::normalize(point - origin);
+    glm::vec3 v = glm::normalize(-direction);
     glm::vec3 s;
     glm::vec3 r;
 
     vector<Light*>* lights = scene.getLights();
 
+    // iterate through lights
     for (vector<Light*>::iterator i = lights->begin(); i != lights->end(); i++) {
-        glm::vec3 s = glm::normalize(point - (*i)->getPosition());
-        // TODO: cast shadow ray
+
+        glm::vec3 s = glm::normalize((*i)->getPosition() - point);
+
+        // cast shadow vector
+        if (scene.cast(point + EPSILON * s, s).object != nullptr) { 
+            continue;
+        }
+
         glm::vec3 r = glm::reflect(-s, n);
-        color += material->getColor(n, v, s, r, **i);
+        color += material->getColor(n, s, r, v, **i);
+
     }
     
     return color;
@@ -56,7 +64,7 @@ float Sphere::intersect(glm::vec3 origin, glm::vec3 direction) {
     float discriminant = b * b - 4 * c;
 
     // return distance if ray intersects
-    return (discriminant > 0) ? (sqrt(discriminant) - b) / 2 : INFINITY;
+    return (discriminant >= 0) ? (-b - sqrt(discriminant)) / 2 : INFINITY;
 
 }
 
@@ -71,6 +79,9 @@ glm::vec3 Sphere::getNormal(glm::vec3 point) {
 
 // TRIANGLE
 
+/**
+ * Construct a triangle from 3 points, specified counterclockwise.
+ */
 Triangle::Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, Material *material) {
     this->a = a;
     this->b = b;
@@ -93,7 +104,7 @@ float Triangle::intersect(glm::vec3 origin, glm::vec3 direction) {
     glm::vec3 q = glm::cross(t, e1);
 
     // parallel
-    if (abs(glm::dot(p, e1)) < 0.005f) {
+    if (abs(glm::dot(p, e1)) < EPSILON) {
         return false;
     }
 

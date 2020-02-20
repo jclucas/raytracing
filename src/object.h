@@ -4,6 +4,9 @@
 class Material;
 class Scene;
 
+// for floating point equality cutoffs
+#define EPSILON 0.0001f
+
 class Object {
 
     protected:
