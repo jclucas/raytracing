@@ -1,6 +1,9 @@
+#pragma once
+
 #include <vector>
 #include <glm/mat4x4.hpp>
 
+class KDTree;
 class Object;
 class Light;
 
@@ -17,10 +20,12 @@ class Scene {
         vector<Light*> lights;
         vector<Object*> objects;
         glm::vec3 background;
+        KDTree* tree;
     public:
         Scene(glm::vec3 background);
         vector<Light*>* getLights();
         void transform(glm::mat4 m);
+        void generateTree();
         void add(Light& light);
         void add(Object& object);
         Hit cast(glm::vec3 origin, glm::vec3 direction);

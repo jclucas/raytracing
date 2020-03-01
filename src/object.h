@@ -1,5 +1,10 @@
+#pragma once
+
+#include <vector>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
+
+#include "bounding.h"
 
 class Material;
 class Scene;
@@ -11,9 +16,13 @@ class Object {
 
     protected:
         glm::vec3 position;
+        BoundingBox bound;
         Material *material;
+        virtual void setBounds() = 0;
 
     public:
+        glm::vec3 getPosition();
+        BoundingBox& getBounds();
         virtual void transform(glm::mat4 m);
         virtual float intersect(glm::vec3 origin, glm::vec3 direction) = 0;
         virtual glm::vec3 getNormal(glm::vec3 point) = 0;
@@ -25,6 +34,7 @@ class Sphere : public Object {
 
     private:
         float radius;
+        virtual void setBounds() override;
     
     public:
         Sphere(glm::vec3 position, float radius, Material *material);
@@ -39,6 +49,7 @@ class Triangle : public Object {
         glm::vec3 a;
         glm::vec3 b;
         glm::vec3 c;
+        virtual void setBounds() override;
 
     public:
         Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, Material *material);

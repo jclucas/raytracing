@@ -2,11 +2,14 @@
 #include <glm/vec3.hpp>
 
 #include "scene.h"
+#include "kd.h"
 #include "object.h"
 #include "light.h"
 
+// temp
 #include <iostream>
 
+// TODO: change
 using namespace std;
 
 /**
@@ -17,6 +20,7 @@ Scene::Scene(glm::vec3 background) {
     this->background = background;
     this->lights = vector<Light*>();
     this->objects = vector<Object*>();
+    this->tree = nullptr;
 }
 
 
@@ -38,6 +42,13 @@ void Scene::transform(glm::mat4 m) {
         (*i)->transform(m);
     }
 
+}
+
+/**
+ * Create K-D tree for rendering.
+ */
+void Scene::generateTree() {
+    tree = new KDTree(objects);
 }
 
 /**
