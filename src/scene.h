@@ -5,6 +5,7 @@
 
 class KDTree;
 class Object;
+class Primitive;
 class Light;
 
 using namespace std;
@@ -12,7 +13,7 @@ using namespace std;
 class Scene {
     
     typedef struct Hit {
-        Object *object;
+        Primitive *object;
         glm::vec3 point;
     } Hit;
 
@@ -21,6 +22,9 @@ class Scene {
         vector<Object*> objects;
         glm::vec3 background;
         KDTree* tree;
+        // temp field to emulate kd tree
+        vector<Primitive*> prims;
+
     public:
         Scene(glm::vec3 background);
         vector<Light*>* getLights();

@@ -18,7 +18,14 @@ BoundingBox& Object::getBounds() {
     return bound;
 }
 
-glm::vec3 Object::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene) {
+void Object::transform(glm::mat4 m) {
+    position = m * glm::vec4(position, 1);
+    setBounds();
+}
+
+// PRIMITIVE
+
+glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene) {
 
     glm::vec3 color = glm::vec3(0);
 
@@ -48,9 +55,10 @@ glm::vec3 Object::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 directio
 
 }
 
-void Object::transform(glm::mat4 m) {
-    position = m * glm::vec4(position, 1);
-    setBounds();
+vector<Primitive*>* Primitive::getPrimitives() {
+    auto v = new vector<Primitive*>();
+    v->push_back(this);
+    return v;
 }
 
 // SPHERE
@@ -161,4 +169,71 @@ void Triangle::setBounds() {
     // bound.max.y = max(a.y, b.y, c.y);
     // bound.max.z = max(a.z, b.z, c.z);
     bound = BoundingBox({a, b, c});
+}
+
+// MESH
+
+/**
+ * Create an empty mesh.
+ */
+Mesh::Mesh(Material* material) {
+    position = glm::vec3(0, 0, 0);
+    this->material = material;
+    this->components = vector<Primitive*>();
+    setBounds();
+}
+
+Mesh::Mesh(string filename, Material* material) {
+    // TODO: ply import
+}
+
+void Mesh::setBounds() {
+    
+    bound = BoundingBox();
+
+    for (auto it = components.begin(); it != components.end(); it++) {
+        bound.expand((*it)->getBounds());
+    }
+
+}
+
+void Mesh::transform(glm::mat4 m) {
+
+    for (auto it = components.begin(); it != components.end(); it++) {
+        (*it)->transform(m);
+    }
+
+    position = m * glm::vec4(position, 1);
+    setBounds(); // TODO: optimize
+
+}
+
+vector<Primitive*>* Mesh::getPrimitives() {
+    return &components;
+}
+
+/**
+ * Add a triangle to the mesh.
+ * @param a first point
+ * @param b second point
+ * @param c third point
+ */
+void Mesh::add(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
+    
+    // add component to list
+    Triangle* tri = new Triangle(a, b, c, material);
+    components.push_back(tri);
+
+    // recalculate (or set) mesh position
+    if (components.size() == 1) {
+        position = tri->getPosition();
+    } else {
+        float size = (float) components.size();
+        position *= (size - 1.0f) / size;
+        position += tri->getPosition() / size;
+    }
+
+    // expand bounding box
+    bound.expand(tri->getBounds());
+
 }

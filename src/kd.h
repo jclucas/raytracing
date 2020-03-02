@@ -28,5 +28,5 @@ class KDTree {
 
     public:
         KDTree(vector<Object*> list);
-        // void insert(vector<T*> ptr);
+        
 };

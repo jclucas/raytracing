@@ -5,9 +5,6 @@
 #include "scene.h"
 #include "camera.h"
 
-// temp
-#include <iostream>
-
 // TODO: change
 using namespace std;
 
@@ -39,7 +36,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up) {
  */
 glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
 
-    // transform scene to camera space
+    // transform scene to camera space    
     scene.transform(m);
     position = m * glm::vec4(position, 0);
 

@@ -48,7 +48,16 @@ void Scene::transform(glm::mat4 m) {
  * Create K-D tree for rendering.
  */
 void Scene::generateTree() {
-    tree = new KDTree(objects);
+
+    prims = vector<Primitive*>();
+
+    vector<Primitive*>* obj;
+    for (auto it = objects.begin(); it != objects.end(); it++) {
+        obj = (*it)->getPrimitives();
+        prims.insert(prims.end(), obj->begin(), obj->end());
+    }
+
+    // tree = new KDTree(objects);
 }
 
 /**
@@ -80,8 +89,8 @@ Scene::Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
     int index = -1;
 
     // intersect all objects
-    for (int i = 0; i < objects.size(); i++) {
-        if ((dist = objects[i]->intersect(origin, direction)) < min && dist > 0) {
+    for (int i = 0; i < prims.size(); i++) {
+        if ((dist = prims[i]->intersect(origin, direction)) < min && dist > 0) {
             min = dist;
             index = i;
         }
@@ -89,7 +98,7 @@ Scene::Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
 
     // create return value
     Scene::Hit hit;
-    hit.object = (index >= 0)? objects[index] : nullptr;
+    hit.object = (index >= 0)? prims[index] : nullptr;
     hit.point = origin + direction * min;
     return hit;
 

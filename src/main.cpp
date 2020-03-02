@@ -1,4 +1,6 @@
 #include <fstream>
+//temp
+#include <iostream>
 
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
@@ -28,15 +30,19 @@ int main() {
 
     // set up scene
     Scene scene = Scene(background);
-    Triangle *tri1 = new Triangle(glm::vec3(-25, 7, 0), glm::vec3(-25, -3, 0), glm::vec3(5, -3, 0), floor);
-    Triangle *tri2 = new Triangle(glm::vec3(5, -3, 0), glm::vec3(5, 7, 0), glm::vec3(-25, 7, 0), floor);
+    Mesh *plane = new Mesh(floor);
+    plane->add(glm::vec3(-25, 7, 0), glm::vec3(-25, -3, 0), glm::vec3(5, -3, 0));
+    plane->add(glm::vec3(5, -3, 0), glm::vec3(5, 7, 0), glm::vec3(-25, 7, 0));
+    // Triangle *tri1 = new Triangle(glm::vec3(-25, 7, 0), glm::vec3(-25, -3, 0), glm::vec3(5, -3, 0), floor);
+    // Triangle *tri2 = new Triangle(glm::vec3(5, -3, 0), glm::vec3(5, 7, 0), glm::vec3(-25, 7, 0), floor);
     Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, reflective);
     Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, transparent);
     Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
     scene.add(*sphere1);
     scene.add(*sphere2);
-    scene.add(*tri1);
-    scene.add(*tri2);
+    scene.add(*plane);
+    // scene.add(*tri1);
+    // scene.add(*tri2);
     scene.add(*light);
 
     // set up camera
