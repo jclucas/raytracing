@@ -92,9 +92,10 @@ class Mesh : public Object {
 
     public:
         Mesh(Material* material);
-        Mesh(std::string filename, Material* material);
+        // Mesh(std::string filename, Material* material);
         virtual void transform(glm::mat4 m) override;
         virtual vector<Primitive*>* getPrimitives() override;
         void add(glm::vec3 a, glm::vec3 b, glm::vec3 c);
+        void read(std::string filename);
 
 };

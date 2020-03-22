@@ -16,16 +16,17 @@ using namespace std;
 
 int main() {
 
-    // image size
+    // output properties
     const int height = 800;
     const int width = 1280;
+    const std::string filename = "render.ppm";
 
     // scene characteristics
     const glm::vec3 background = glm::vec3(0, 0.5, 1);
 
     // create materials
     Phong *reflective = new Phong(glm::vec3(0.8f), glm::vec3(1), 10.0f);
-    Phong *transparent = new Phong(glm::vec3(0.5f), glm::vec3(1), 10.0f);
+    Phong *transparent = new Phong(glm::vec3(0.95f), glm::vec3(0.3f), 2.0f);
     Phong *floor = new Phong(glm::vec3(1, 0.5f, 0), glm::vec3(1), 10.0f);
 
     // set up scene
@@ -35,25 +36,30 @@ int main() {
     plane->add(glm::vec3(5, -3, 0), glm::vec3(5, 7, 0), glm::vec3(-25, 7, 0));
     // Triangle *tri1 = new Triangle(glm::vec3(-25, 7, 0), glm::vec3(-25, -3, 0), glm::vec3(5, -3, 0), floor);
     // Triangle *tri2 = new Triangle(glm::vec3(5, -3, 0), glm::vec3(5, 7, 0), glm::vec3(-25, 7, 0), floor);
-    Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, reflective);
+    Mesh *cube = new Mesh(transparent);
+    cube->read("resources/cube.ply");
+    // Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, reflective);
     Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, transparent);
     Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
-    scene.add(*sphere1);
+    // scene.add(*sphere1);
     scene.add(*sphere2);
     scene.add(*plane);
     // scene.add(*tri1);
     // scene.add(*tri2);
+    scene.add(*cube);
     scene.add(*light);
 
     // set up camera
     Camera camera = Camera(glm::vec3(10, 0, 2.5), glm::vec3(-1, 0, -glm::tan(glm::radians(5.0f))), glm::vec3(0, 0, 1));
 
     // render
+    cout << "rendering..." << endl;
     glm::vec3 *frame = camera.render(height, width, scene);
 
     // save to ppm
     ofstream file;
-    file.open("render.ppm");
+    cout << "saving to " << filename << "..." << endl;
+    file.open(filename);
     file << "P3 " << width << " " << height << " 255\n";
 
     // find maximum intensity component
@@ -71,7 +77,9 @@ int main() {
         file << pixel.x << " " << pixel.y << " " << pixel.z << "\n";
     }
 
+    cout << "success." << endl;
     delete[] frame;
     file.close();
+
 
 }

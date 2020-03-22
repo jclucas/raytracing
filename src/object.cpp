@@ -1,7 +1,8 @@
+#include <iostream>
+#include <fstream>
 #include <glm/vec3.hpp>
 #include <glm/geometric.hpp>
-// temp
-#include <iostream>
+#include <miniply.h>
 
 #include "scene.h"
 #include "object.h"
@@ -162,6 +163,7 @@ glm::vec3 Triangle::getNormal(glm::vec3 point) {
  * Calculate axis aligned bounding box.
  */
 void Triangle::setBounds() {
+    // TODO: compare efficiency
     // bound.min.x = min(a.x, b.x, c.x);
     // bound.min.y = min(a.y, b.y, c.y);
     // bound.min.z = min(a.z, b.z, c.z);
@@ -181,10 +183,6 @@ Mesh::Mesh(Material* material) {
     this->material = material;
     this->components = vector<Primitive*>();
     setBounds();
-}
-
-Mesh::Mesh(string filename, Material* material) {
-    // TODO: ply import
 }
 
 void Mesh::setBounds() {
@@ -235,5 +233,73 @@ void Mesh::add(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
 
     // expand bounding box
     bound.expand(tri->getBounds());
+    
+}
+
+/**
+ * Read triangles from a PLY file into a mesh.
+ */
+void Mesh::read(std::string filename) {
+
+    miniply::PLYReader reader = miniply::PLYReader(filename.c_str());
+    
+    if (!reader.valid()) {
+        cout << "Invalid file: " << filename << endl;
+        exit(0);
+    }
+
+    size_t numVertices;
+    size_t numTriangles;
+
+    // create temp buffers
+    float* vertices;
+    uint32_t* triangles;
+    uint32_t* vertexProps = new uint32_t[3];
+    uint32_t* triProps = new uint32_t[3];
+
+    // assume polygons are triangles
+    miniply::PLYElement* faceElem = reader.get_element(reader.find_element(miniply::kPLYFaceElement));
+    faceElem->convert_list_to_fixed_size(faceElem->find_property("vertex_indices"), 3, triProps);
+
+    // get vertices
+    if (reader.has_element() && reader.element_is(miniply::kPLYVertexElement)) {
+        reader.load_element();
+        reader.find_pos(vertexProps);
+        numVertices = reader.num_rows();
+        vertices = new float[numVertices * 3];
+        reader.extract_properties(vertexProps, 3, miniply::PLYPropertyType::Float, vertices);
+        reader.next_element();
+    }
+
+    if (vertices == nullptr) {
+        cout << "failed to read vertices from " << filename << "." << endl;
+        exit(0);
+    }
+
+    // get triangles
+    if (reader.has_element() && reader.element_is(miniply::kPLYFaceElement)) {
+        reader.load_element();
+        numTriangles = reader.num_rows();
+        triangles = new uint32_t[numTriangles * 3];
+        reader.extract_properties(triProps, 3, miniply::PLYPropertyType::Int, triangles);
+    }
+
+    // add triangles to mesh
+    int aIdx, bIdx, cIdx;
+    for (size_t i = 0; i < numTriangles; i++) {
+        aIdx = triangles[3 * i];
+        bIdx = triangles[3 * i + 1];
+        cIdx = triangles[3 * i + 2];
+        add(glm::vec3(vertices[3 * aIdx], vertices[3 * aIdx + 1], vertices[3 * aIdx + 2]),
+            glm::vec3(vertices[3 * bIdx], vertices[3 * bIdx + 1], vertices[3 * bIdx + 2]),
+            glm::vec3(vertices[3 * cIdx], vertices[3 * cIdx + 1], vertices[3 * cIdx + 2]));
+    }
+
+    delete[] vertices;
+    delete[] triangles;
+    delete[] vertexProps;
+    delete[] triProps;
+
+    cout << "read data from " << filename << "." << endl;
 
 }

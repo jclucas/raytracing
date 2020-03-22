@@ -51,6 +51,7 @@ void Scene::generateTree() {
 
     prims = vector<Primitive*>();
 
+    // iterate through scene objects, adding primitives to list
     vector<Primitive*>* obj;
     for (auto it = objects.begin(); it != objects.end(); it++) {
         obj = (*it)->getPrimitives();
