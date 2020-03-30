@@ -10,6 +10,7 @@
 #include "camera.h"
 #include "object.h"
 #include "material.h"
+#include "texture.h"
 #include "light.h"
 
 using namespace std;
@@ -24,29 +25,29 @@ int main() {
     // scene characteristics
     const glm::vec3 background = glm::vec3(0, 0.5, 1);
 
+    // create textures
+    CheckTexture *check = new CheckTexture(glm::vec3(1, 0, 0), glm::vec3(1, 1, 0), 2.0f);
+
     // create materials
     Phong *reflective = new Phong(glm::vec3(0.8f), glm::vec3(1), 10.0f);
     Phong *transparent = new Phong(glm::vec3(0.95f), glm::vec3(0.3f), 2.0f);
     Phong *floor = new Phong(glm::vec3(1, 0.5f, 0), glm::vec3(1), 10.0f);
+    floor->add(check);
 
     // set up scene
     Scene scene = Scene(background);
     Mesh *plane = new Mesh(floor);
     plane->add(glm::vec3(-25, 7, 0), glm::vec3(-25, -3, 0), glm::vec3(5, -3, 0));
     plane->add(glm::vec3(5, -3, 0), glm::vec3(5, 7, 0), glm::vec3(-25, 7, 0));
-    // Triangle *tri1 = new Triangle(glm::vec3(-25, 7, 0), glm::vec3(-25, -3, 0), glm::vec3(5, -3, 0), floor);
-    // Triangle *tri2 = new Triangle(glm::vec3(5, -3, 0), glm::vec3(5, 7, 0), glm::vec3(-25, 7, 0), floor);
-    Mesh *cube = new Mesh(transparent);
-    cube->read("resources/cube.ply");
-    // Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, reflective);
+    // Mesh *cube = new Mesh(transparent);
+    // cube->read("resources/cube.ply");
+    Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, reflective);
     Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, transparent);
     Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
-    // scene.add(*sphere1);
+    scene.add(*sphere1);
     scene.add(*sphere2);
     scene.add(*plane);
-    // scene.add(*tri1);
-    // scene.add(*tri2);
-    scene.add(*cube);
+    // scene.add(*cube);
     scene.add(*light);
 
     // set up camera

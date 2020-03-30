@@ -48,7 +48,7 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
         }
 
         glm::vec3 r = glm::reflect(-s, n);
-        color += material->getColor(n, s, r, v, **i);
+        color += material->getColor(point, n, s, r, v, **i);
 
     }
     
