@@ -18,9 +18,9 @@ class CheckTexture : public Texture {
 
     private:
         glm::vec3 color1, color2;
-        float size;
+        float uSize, vSize;
     public:
-        CheckTexture(glm::vec3 color1, glm::vec3 color2, float size);
+        CheckTexture(glm::vec3 color1, glm::vec3 color2, float uSize, float vSize);
         virtual glm::vec3 getValue(float u, float v) override;
 
 };

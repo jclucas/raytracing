@@ -23,11 +23,13 @@ class Object {
         glm::vec3 position;
         BoundingBox bound;
         Material *material;
+        glm::mat4 invWorldMatrix = glm::mat4(1);
         virtual void setBounds() = 0;
 
     public:
         glm::vec3 getPosition();
         BoundingBox& getBounds();
+        glm::vec3 inverseTransform(glm::vec3 p);
         virtual void transform(glm::mat4 m);
         virtual vector<Primitive*>* getPrimitives() = 0;
 
@@ -91,12 +93,12 @@ class Mesh : public Object {
         glm::vec3 scale;
         vector<Primitive*> components;
         virtual void setBounds() override;
+        glm::mat4 getObjectTransform();
 
     public:
         Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Material* material);
         virtual void transform(glm::mat4 m) override;
         virtual vector<Primitive*>* getPrimitives() override;
-        glm::mat4 getObjectTransform();
         void add(glm::vec3 a, glm::vec3 b, glm::vec3 c);
         void read(std::string filename);
 

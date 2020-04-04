@@ -26,7 +26,7 @@ int main() {
     const glm::vec3 background = glm::vec3(0, 0.5, 1);
 
     // create textures
-    CheckTexture *check = new CheckTexture(glm::vec3(1, 0, 0), glm::vec3(1, 1, 0), 2.0f);
+    CheckTexture *check = new CheckTexture(glm::vec3(1, 0, 0), glm::vec3(1, 1, 0), 6.0f, 3.0f);
 
     // create materials
     Phong *reflective = new Phong(glm::vec3(0.8f), glm::vec3(1), 10.0f);
@@ -39,15 +39,15 @@ int main() {
     Mesh *plane = new Mesh(glm::vec3(-10, 2, 0), glm::vec3(0), glm::vec3(15, 5, 1), floor);
     plane->add(glm::vec3(-1, 1, 0), glm::vec3(-1, -1, 0), glm::vec3(1, -1, 0));
     plane->add(glm::vec3(1, -1, 0), glm::vec3(1, 1, 0), glm::vec3(-1, 1, 0));
-    Mesh *cube = new Mesh(glm::vec3(0, 0, 1), glm::vec3(0, 0, glm::radians(15.0f)), glm::vec3(1), reflective);
-    cube->read("resources/cube.ply");
-    // Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, reflective);
+    // Mesh *cube = new Mesh(glm::vec3(0, 0, 1), glm::vec3(0, 0, glm::radians(15.0f)), glm::vec3(1), reflective);
+    // cube->read("resources/cube.ply");
+    Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, reflective);
     Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, transparent);
     Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
-    // scene.add(*sphere1);
+    scene.add(*sphere1);
     scene.add(*sphere2);
     scene.add(*plane);
-    scene.add(*cube);
+    // scene.add(*cube);
     scene.add(*light);
 
     // set up camera

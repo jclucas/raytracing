@@ -20,8 +20,13 @@ BoundingBox& Object::getBounds() {
     return bound;
 }
 
+glm::vec3 Object::inverseTransform(glm::vec3 p) {
+    return invWorldMatrix * glm::vec4(p, 1);
+}
+
 void Object::transform(glm::mat4 m) {
     position = m * glm::vec4(position, 1);
+    invWorldMatrix =  invWorldMatrix * glm::inverse(m);
     setBounds();
 }
 
@@ -49,7 +54,8 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
         }
 
         glm::vec3 r = glm::reflect(-s, n);
-        color += material->getColor(point, n, s, r, v, **i);
+        glm::vec3 objPoint = (inverseTransform(point));
+        color += material->getColor(objPoint, n, s, r, v, **i);
 
     }
     
@@ -122,6 +128,7 @@ void Triangle::transform(glm::mat4 m) {
     b = m * glm::vec4(b, 1);
     c = m * glm::vec4(c, 1);
     position = (a + b + c) / 3.0f;
+    invWorldMatrix =  invWorldMatrix * glm::inverse(m);
     setBounds();
     // cout << "min: (" << bound.min.x << ", " << bound.min.y << ", " << bound.min.z << ")\n";
     // cout << "max: (" << bound.max.x << ", " << bound.max.y << ", " << bound.max.z << ")" << std::endl;
@@ -206,6 +213,7 @@ void Mesh::transform(glm::mat4 m) {
 
     position = m * glm::vec4(position, 1);
     rotation = m * glm::vec4(rotation, 1);
+    invWorldMatrix =  invWorldMatrix * glm::inverse(m);
     setBounds(); // TODO: optimize
 
 }
@@ -213,7 +221,6 @@ void Mesh::transform(glm::mat4 m) {
 vector<Primitive*>* Mesh::getPrimitives() {
 
     glm::mat4 m = getObjectTransform();
-    // transform(m);
     
     // TODO: copy before transforming?
     for (auto it = components.begin(); it != components.end(); it++) {
