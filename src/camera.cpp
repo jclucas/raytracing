@@ -5,9 +5,6 @@
 #include "scene.h"
 #include "camera.h"
 
-// TODO: change
-using namespace std;
-
 Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up) {
 
     this->position = position;
@@ -36,12 +33,12 @@ Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up) {
  */
 glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
 
+    // create k-d tree
+    scene.generateTree();
+
     // transform scene to camera space    
     scene.transform(m);
     position = m * glm::vec4(position, 0);
-
-    // create k-d tree
-    scene.generateTree();
 
     // create framebuffer
     glm::vec3 *frame = new glm::vec3[height * width];

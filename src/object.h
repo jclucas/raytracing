@@ -87,14 +87,16 @@ class Triangle : public Primitive {
 class Mesh : public Object {
 
     private:
+        glm::vec3 rotation;
+        glm::vec3 scale;
         vector<Primitive*> components;
         virtual void setBounds() override;
 
     public:
-        Mesh(Material* material);
-        // Mesh(std::string filename, Material* material);
+        Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Material* material);
         virtual void transform(glm::mat4 m) override;
         virtual vector<Primitive*>* getPrimitives() override;
+        glm::mat4 getObjectTransform();
         void add(glm::vec3 a, glm::vec3 b, glm::vec3 c);
         void read(std::string filename);
 

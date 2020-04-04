@@ -2,6 +2,7 @@
 #include <fstream>
 #include <glm/vec3.hpp>
 #include <glm/geometric.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <miniply.h>
 
 #include "scene.h"
@@ -178,8 +179,10 @@ void Triangle::setBounds() {
 /**
  * Create an empty mesh.
  */
-Mesh::Mesh(Material* material) {
-    position = glm::vec3(0, 0, 0);
+Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Material* material) {
+    this->position = position;
+    this->rotation = rotation;
+    this->scale = scale;
     this->material = material;
     this->components = vector<Primitive*>();
     setBounds();
@@ -202,12 +205,39 @@ void Mesh::transform(glm::mat4 m) {
     }
 
     position = m * glm::vec4(position, 1);
+    rotation = m * glm::vec4(rotation, 1);
     setBounds(); // TODO: optimize
 
 }
 
 vector<Primitive*>* Mesh::getPrimitives() {
+
+    glm::mat4 m = getObjectTransform();
+    // transform(m);
+    
+    // TODO: copy before transforming?
+    for (auto it = components.begin(); it != components.end(); it++) {
+        (*it)->transform(m);
+    }
+
     return &components;
+
+}
+
+/**
+ * Returns a transform matrix based on the current position and rotation.
+ */
+glm::mat4 Mesh::getObjectTransform() {
+
+    glm::mat4 trans = glm::mat4(1);
+    trans = glm::translate(trans, position);
+    trans = glm::rotate(trans, rotation.x, glm::vec3(1, 0, 0));
+    trans = glm::rotate(trans, rotation.y, glm::vec3(0, 1, 0));
+    trans = glm::rotate(trans, rotation.z, glm::vec3(0, 0, 1));
+    trans = glm::scale(trans, scale);
+
+    return trans;
+
 }
 
 /**
@@ -223,13 +253,13 @@ void Mesh::add(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
     components.push_back(tri);
 
     // recalculate (or set) mesh position
-    if (components.size() == 1) {
-        position = tri->getPosition();
-    } else {
-        float size = (float) components.size();
-        position *= (size - 1.0f) / size;
-        position += tri->getPosition() / size;
-    }
+    // if (components.size() == 1) {
+    //     position = tri->getPosition();
+    // } else {
+    //     float size = (float) components.size();
+    //     position *= (size - 1.0f) / size;
+    //     position += tri->getPosition() / size;
+    // }
 
     // expand bounding box
     bound.expand(tri->getBounds());

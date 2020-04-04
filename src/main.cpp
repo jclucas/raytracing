@@ -36,18 +36,18 @@ int main() {
 
     // set up scene
     Scene scene = Scene(background);
-    Mesh *plane = new Mesh(floor);
-    plane->add(glm::vec3(-25, 7, 0), glm::vec3(-25, -3, 0), glm::vec3(5, -3, 0));
-    plane->add(glm::vec3(5, -3, 0), glm::vec3(5, 7, 0), glm::vec3(-25, 7, 0));
-    // Mesh *cube = new Mesh(transparent);
-    // cube->read("resources/cube.ply");
-    Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, reflective);
+    Mesh *plane = new Mesh(glm::vec3(-10, 2, 0), glm::vec3(0), glm::vec3(15, 5, 1), floor);
+    plane->add(glm::vec3(-1, 1, 0), glm::vec3(-1, -1, 0), glm::vec3(1, -1, 0));
+    plane->add(glm::vec3(1, -1, 0), glm::vec3(1, 1, 0), glm::vec3(-1, 1, 0));
+    Mesh *cube = new Mesh(glm::vec3(0, 0, 1), glm::vec3(0, 0, glm::radians(15.0f)), glm::vec3(1), reflective);
+    cube->read("resources/cube.ply");
+    // Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, reflective);
     Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, transparent);
     Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
-    scene.add(*sphere1);
+    // scene.add(*sphere1);
     scene.add(*sphere2);
     scene.add(*plane);
-    // scene.add(*cube);
+    scene.add(*cube);
     scene.add(*light);
 
     // set up camera
@@ -59,7 +59,6 @@ int main() {
 
     // save to ppm
     ofstream file;
-    cout << "saving to " << filename << "..." << endl;
     file.open(filename);
     file << "P3 " << width << " " << height << " 255\n";
 
@@ -78,7 +77,7 @@ int main() {
         file << pixel.x << " " << pixel.y << " " << pixel.z << "\n";
     }
 
-    cout << "success." << endl;
+    cout << "saved to " << filename << "." << endl;
     delete[] frame;
     file.close();
 
