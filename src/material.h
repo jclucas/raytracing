@@ -9,8 +9,11 @@ class Texture;
 class Material {
 
     protected:
+        float reflectance = 0;
         std::vector<Texture*>* textures;
     public:
+        void setReflectance(float k);
+        float getReflectance();
         virtual glm::vec3 getColor(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) = 0;
         void add(Texture* texture);
 

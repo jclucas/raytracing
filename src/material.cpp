@@ -4,6 +4,20 @@
 #include "light.h"
 #include "texture.h"
 
+/** 
+ * Set coefficient of reflectance.
+ */
+void Material::setReflectance(float k) {
+    this->reflectance = k;
+}
+
+/**
+ * Return coefficient of reflectance.
+ */
+float Material::getReflectance() {
+    return reflectance;
+}
+
 /**
  * Add a texture map to the material.
  */
@@ -19,8 +33,8 @@ void Material::add(Texture* texture) {
 
 /**
  * Create a Phong material.
- * @param diffuse reflectivity of diffuse illumination
- * @param specular reflectivity of specular illumination
+ * @param diffuse reflectance of diffuse illumination
+ * @param specular reflectance of specular illumination
  * @param sharpness specular exponent
  */
 Phong::Phong(glm::vec3 diffuse, glm::vec3 specular, float sharpness) {

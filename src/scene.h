@@ -33,6 +33,6 @@ class Scene {
         void add(Light& light);
         void add(Object& object);
         Hit cast(glm::vec3 origin, glm::vec3 direction);
-        glm::vec3 getPixel(glm::vec3 origin, glm::vec3 direction);
+        glm::vec3 getPixel(glm::vec3 origin, glm::vec3 direction, int depth);
 
 };

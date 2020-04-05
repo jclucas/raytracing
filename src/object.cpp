@@ -32,7 +32,7 @@ void Object::transform(glm::mat4 m) {
 
 // PRIMITIVE
 
-glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene) {
+glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene, int depth) {
 
     glm::vec3 color = glm::vec3(0);
 
@@ -40,6 +40,7 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
     glm::vec3 v = glm::normalize(-direction);
     glm::vec3 s;
     glm::vec3 r;
+    glm::vec3 objPoint = inverseTransform(point);
 
     vector<Light*>* lights = scene.getLights();
 
@@ -54,8 +55,20 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
         }
 
         glm::vec3 r = glm::reflect(-s, n);
-        glm::vec3 objPoint = (inverseTransform(point));
         color += material->getColor(objPoint, n, s, r, v, **i);
+
+        // recursive call
+        if (depth < MAX_DEPTH) {
+
+            // reflection
+            if (material->getReflectance() > 0) {
+                // TODO: better sampling
+                color += material->getReflectance() * scene.getPixel(point, r, depth + 1);
+            }
+
+            // transmission
+
+        }
 
     }
     

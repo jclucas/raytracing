@@ -14,6 +14,9 @@ class Primitive;
 // for floating point equality cutoffs
 #define EPSILON 0.0001f
 
+// for recursive rays
+#define MAX_DEPTH 2
+
 /**
  * Abstract object class.
  */
@@ -43,7 +46,7 @@ class Primitive : public Object {
     public:
         virtual float intersect(glm::vec3 origin, glm::vec3 direction) = 0;
         virtual glm::vec3 getNormal(glm::vec3 point) = 0;
-        glm::vec3 getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene);
+        glm::vec3 getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene, int depth);
         virtual vector<Primitive*>* getPrimitives() override;
 
 };

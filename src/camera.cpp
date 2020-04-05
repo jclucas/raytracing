@@ -63,7 +63,7 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             dir = glm::normalize(glm::vec3(ul + dw * float(j) + dh * float(i)));
-            frame[i*width + j] = scene.getPixel(position, dir);
+            frame[i*width + j] = scene.getPixel(position, dir, 1);
         }
     }
 

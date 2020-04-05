@@ -89,7 +89,7 @@ Scene::Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
     float min = INFINITY;
     int index = -1;
 
-    // intersect all objects
+    // find closest intersection
     for (int i = 0; i < prims.size(); i++) {
         if ((dist = prims[i]->intersect(origin, direction)) < min && dist > 0) {
             min = dist;
@@ -105,14 +105,14 @@ Scene::Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
 
 }
 
-glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction) {
+glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
     
     Scene::Hit hit = cast(origin, direction);
     
     if (hit.object == nullptr) {
         return background;
     } else {
-        return hit.object->getColor(hit.point, origin, direction, *this);
+        return hit.object->getColor(hit.point, origin, direction, *this, depth);
     }
 
 }
