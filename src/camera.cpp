@@ -45,9 +45,7 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
 
     // define film plane
     glm::vec3 center = glm::vec3(0, 0, length);
-    float aspect = (float) height / width;
     float w = glm::tan(fov) * length;
-    float h = w * aspect;
 
     // amount to step in camera space between pixels
     float step = -w / width;
@@ -60,8 +58,8 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
     ul -= (float(height) / 2 - 0.5f) * dh;
 
     glm::vec3 dir;
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
+    for (size_t i = 0; i < height; i++) {
+        for (size_t j = 0; j < width; j++) {
             dir = glm::normalize(glm::vec3(ul + dw * float(j) + dh * float(i)));
             frame[i*width + j] = scene.getPixel(position, dir, 1);
         }

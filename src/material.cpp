@@ -4,6 +4,27 @@
 #include "light.h"
 #include "texture.h"
 
+/**
+ * Return coefficient of reflectance.
+ */
+float Material::getReflectance() {
+    return reflectance;
+}
+
+/**
+ * Return coefficient of transmittance.
+ */
+float Material::getTransmittance() {
+    return transmittance;
+}
+
+/**
+ * Return index of refraction.
+ */
+float Material::getIOR() {
+    return ior;
+}
+
 /** 
  * Set coefficient of reflectance.
  */
@@ -11,11 +32,18 @@ void Material::setReflectance(float k) {
     this->reflectance = k;
 }
 
-/**
- * Return coefficient of reflectance.
+/** 
+ * Set coefficient of transmittance.
  */
-float Material::getReflectance() {
-    return reflectance;
+void Material::setTransmittance(float k) {
+    this->transmittance = k;
+}
+
+/** 
+ * Set index of refraction.
+ */
+void Material::setIOR(float k) {
+    this->ior = k;
 }
 
 /**

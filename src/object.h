@@ -15,7 +15,7 @@ class Primitive;
 #define EPSILON 0.0001f
 
 // for recursive rays
-#define MAX_DEPTH 2
+#define MAX_DEPTH 5
 
 /**
  * Abstract object class.

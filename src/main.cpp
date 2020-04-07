@@ -32,6 +32,8 @@ int main() {
     Phong *reflective = new Phong(glm::vec3(0.8f), glm::vec3(1), 10.0f);
     reflective->setReflectance(0.5);
     Phong *transparent = new Phong(glm::vec3(0.95f), glm::vec3(0.3f), 2.0f);
+    transparent->setTransmittance(0.8);
+    transparent->setIOR(0.95);
     Phong *floor = new Phong(glm::vec3(1, 0.5f, 0), glm::vec3(1), 10.0f);
     floor->add(check);
 
@@ -40,7 +42,7 @@ int main() {
     Mesh *plane = new Mesh(glm::vec3(-10, 2, 0), glm::vec3(0), glm::vec3(15, 5, 1), floor);
     plane->add(glm::vec3(-1, 1, 0), glm::vec3(-1, -1, 0), glm::vec3(1, -1, 0));
     plane->add(glm::vec3(1, -1, 0), glm::vec3(1, 1, 0), glm::vec3(-1, 1, 0));
-    // Mesh *cube = new Mesh(glm::vec3(0, 0, 1), glm::vec3(0, 0, glm::radians(15.0f)), glm::vec3(1), reflective);
+    // Mesh *cube = new Mesh(glm::vec3(0, 0, 1), glm::vec3(0, 0, glm::radians(30.0f)), glm::vec3(1), transparent);
     // cube->read("resources/cube.ply");
     Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, transparent);
     Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, reflective);

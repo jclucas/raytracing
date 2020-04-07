@@ -50,12 +50,10 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
         glm::vec3 s = glm::normalize((*i)->getPosition() - point);
 
         // cast shadow vector
-        if (scene.cast(point + EPSILON * s, s).object != nullptr) { 
-            continue;
+        if (scene.cast(point + EPSILON * s, s).object == nullptr) { 
+            glm::vec3 r = glm::reflect(-s, n);
+            color += material->getColor(objPoint, n, s, r, v, **i);
         }
-
-        glm::vec3 r = glm::reflect(-s, n);
-        color += material->getColor(objPoint, n, s, r, v, **i);
 
         // recursive call
         if (depth < MAX_DEPTH) {
@@ -63,10 +61,27 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
             // reflection
             if (material->getReflectance() > 0) {
                 // TODO: better sampling
-                color += material->getReflectance() * scene.getPixel(point, r, depth + 1);
+                glm::vec3 reflect = glm::reflect(-v, n);
+                color += material->getReflectance() * scene.getPixel(point + EPSILON * n, reflect, depth + 1);
             }
 
             // transmission
+            if (material->getTransmittance() > 0) {
+
+                glm::vec3 refract;
+                glm::vec3 norm = n;
+                float ratio = 1.0f / material->getIOR();
+                
+                // check if we are entering or exiting material
+                if (glm::dot(-v, n) > 0) {
+                    norm = -norm;
+                    ratio = 1.0f / ratio;
+                }
+
+                refract = glm::refract(-v, norm, ratio);
+                color += material->getTransmittance() * scene.getPixel(point + EPSILON * -norm, refract, depth + 1);
+
+            }
 
         }
 

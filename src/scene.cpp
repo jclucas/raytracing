@@ -90,7 +90,7 @@ Scene::Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
     int index = -1;
 
     // find closest intersection
-    for (int i = 0; i < prims.size(); i++) {
+    for (size_t i = 0; i < prims.size(); i++) {
         if ((dist = prims[i]->intersect(origin, direction)) < min && dist > 0) {
             min = dist;
             index = i;
