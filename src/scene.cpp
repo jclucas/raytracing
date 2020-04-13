@@ -2,9 +2,14 @@
 #include <glm/vec3.hpp>
 
 #include "scene.h"
+#include "kd.h"
 #include "object.h"
 #include "light.h"
 
+// temp
+#include <iostream>
+
+// TODO: change
 using namespace std;
 
 /**
@@ -24,6 +29,7 @@ Scene::Scene(glm::vec3 background) {
     this->background = background;
     this->lights = vector<Light*>();
     this->objects = vector<Object*>();
+    this->tree = nullptr;
 }
 
 
@@ -41,6 +47,27 @@ void Scene::transform(glm::mat4 m) {
         (*i)->transform(m);
     }
 
+    for (vector<Light*>::iterator i = lights.begin(); i != lights.end(); i++) {
+        (*i)->transform(m);
+    }
+
+}
+
+/**
+ * Create K-D tree for rendering.
+ */
+void Scene::generateTree() {
+
+    prims = vector<Primitive*>();
+
+    // iterate through scene objects, adding primitives to list
+    vector<Primitive*>* obj;
+    for (auto it = objects.begin(); it != objects.end(); it++) {
+        obj = (*it)->getPrimitives();
+        prims.insert(prims.end(), obj->begin(), obj->end());
+    }
+
+    // tree = new KDTree(objects);
 }
 
 /**
@@ -63,21 +90,38 @@ void Scene::add(Object &object) {
  * Cast a ray into the scene.
  * @param origin origin of the ray
  * @param direction direction of the ray
- * @return radiance value
+ * @return pointer to intersected object or null pointer
  */
-glm::vec3 Scene::cast(glm::vec3 origin, glm::vec3 direction) {
+Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
     
     float dist;
     float min = INFINITY;
-    glm::vec3 color = background;
+    int index = -1;
 
-    for (vector<Object*>::iterator i = objects.begin(); i != objects.end(); i++) {
-        if ((dist = (*i)->intersect(origin, direction)) < min) {
+    // find closest intersection
+    for (size_t i = 0; i < prims.size(); i++) {
+        if ((dist = prims[i]->intersect(origin, direction)) < min && dist > 0) {
             min = dist;
-            color = (*i)->getColor(origin + dist * direction, origin, direction, *this);
+            index = i;
         }
     }
 
-    return color;
+    // create return value
+    Hit hit;
+    hit.object = (index >= 0)? prims[index] : nullptr;
+    hit.point = origin + direction * min;
+    return hit;
+
+}
+
+glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
+    
+    Hit hit = cast(origin, direction);
+    
+    if (hit.object == nullptr) {
+        return background;
+    } else {
+        return hit.object->getColor(hit.point, origin, direction, *this, depth);
+    }
 
 }

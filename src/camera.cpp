@@ -2,12 +2,8 @@
 #include <glm/geometric.hpp>
 #include <glm/vec2.hpp>
 
-#include <iostream>
-
 #include "scene.h"
 #include "camera.h"
-
-using namespace std;
 
 Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up) {
 
@@ -37,7 +33,10 @@ Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up) {
  */
 glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
 
-    // transform scene to camera space
+    // create k-d tree
+    scene.generateTree();
+
+    // transform scene to camera space    
     scene.transform(m);
     position = m * glm::vec4(position, 0);
 
@@ -46,9 +45,7 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
 
     // define film plane
     glm::vec3 center = glm::vec3(0, 0, length);
-    float aspect = (float) height / width;
     float w = glm::tan(fov) * length;
-    float h = w * aspect;
 
     // amount to step in camera space between pixels
     float step = -w / width;
@@ -60,15 +57,11 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
     ul -= (float(width) / 2 - 0.5f) * dw;
     ul -= (float(height) / 2 - 0.5f) * dh;
 
-    // cout << "ul: " << ul.x << " " << ul.y << " " << ul.z <<endl;
-    // cout << "dw: " << dw.x << " " << dw.y << " " << dw.z <<endl;
-    // cout << "dh: " << dh.x << " " << dh.y << " " << dh.z <<endl;
-
     glm::vec3 dir;
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
+    for (size_t i = 0; i < height; i++) {
+        for (size_t j = 0; j < width; j++) {
             dir = glm::normalize(glm::vec3(ul + dw * float(j) + dh * float(i)));
-            frame[i*width + j] = scene.cast(position, dir);
+            frame[i*width + j] = scene.getPixel(position, dir, 1);
         }
     }
 

@@ -1,11 +1,11 @@
 #include <iostream>
 #include <fstream>
-
 #include <glm/vec3.hpp>
 
 #include "camera.h"
 #include "object.h"
 #include "material.h"
+#include "texture.h"
 #include "light.h"
 #include "command.h"
 
