@@ -10,12 +10,12 @@ class Light;
 
 using namespace std;
 
-class Scene {
-    
-    typedef struct Hit {
-        Primitive *object;
-        glm::vec3 point;
-    } Hit;
+typedef struct Hit {
+    Primitive *object;
+    glm::vec3 point;
+} Hit;
+
+class Scene {    
 
     private:
         vector<Light*> lights;

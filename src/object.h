@@ -12,7 +12,7 @@ class Scene;
 class Primitive;
 
 // for floating point equality cutoffs
-#define EPSILON 0.0001f
+#define EPSILON 0.001f
 
 // for recursive rays
 #define MAX_DEPTH 5

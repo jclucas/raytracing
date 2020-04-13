@@ -50,7 +50,9 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
         glm::vec3 s = glm::normalize((*i)->getPosition() - point);
 
         // cast shadow vector
-        if (scene.cast(point + EPSILON * s, s).object == nullptr) { 
+        Hit shadow = scene.cast(point + EPSILON * n, s);
+        float dist = glm::length((*i)->getPosition() - point);
+        if (shadow.object == nullptr || dist < glm::length (shadow.point - point)) { 
             glm::vec3 r = glm::reflect(-s, n);
             color += material->getColor(objPoint, n, s, r, v, **i);
         }
@@ -116,8 +118,17 @@ float Sphere::intersect(glm::vec3 origin, glm::vec3 direction) {
 
     float discriminant = b * b - 4 * c;
 
-    // return distance if ray intersects
-    return (discriminant >= 0) ? (-b - sqrt(discriminant)) / 2 : INFINITY;
+    // if negative discriminant, no intersection
+    if (discriminant < 0) {
+        return INFINITY;
+    }
+
+    // get zeros
+    float first = (-b - sqrt(discriminant)) / 2;
+    float second = (-b + sqrt(discriminant)) / 2;
+
+    // return nearest intersection > 0
+    return (first > EPSILON) ? first : (second > EPSILON) ? second : INFINITY;
 
 }
 

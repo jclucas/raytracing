@@ -83,7 +83,7 @@ void Scene::add(Object &object) {
  * @param direction direction of the ray
  * @return pointer to intersected object or null pointer
  */
-Scene::Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
+Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
     
     float dist;
     float min = INFINITY;
@@ -98,7 +98,7 @@ Scene::Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
     }
 
     // create return value
-    Scene::Hit hit;
+    Hit hit;
     hit.object = (index >= 0)? prims[index] : nullptr;
     hit.point = origin + direction * min;
     return hit;
@@ -107,7 +107,7 @@ Scene::Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
 
 glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
     
-    Scene::Hit hit = cast(origin, direction);
+    Hit hit = cast(origin, direction);
     
     if (hit.object == nullptr) {
         return background;
