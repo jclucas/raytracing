@@ -16,6 +16,10 @@ class CommandLine {
         unordered_map<string, Object*> objects;
         void list();
         void add(stringstream& args);
+        void set(stringstream& args);
+        void set(Light* light, string prop, stringstream& args);
+        void set(Material* material, string prop, stringstream& args);
+        void set(Object* object, string prop, stringstream& args);
         void render(stringstream& args);
 
     public:

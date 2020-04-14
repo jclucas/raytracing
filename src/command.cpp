@@ -30,6 +30,8 @@ void CommandLine::parse(string& input) {
         list();
     } else if (cmd == "add") {
         add(args);
+    } else if (cmd == "set") {
+        set(args);
     } else if (cmd == "render") {
         render(args);
     } else {
@@ -137,8 +139,7 @@ void CommandLine::add(stringstream& args) {
 
         try {
             materials[mat];
-        }
-        catch (const std::out_of_range& e) {
+        } catch (const std::out_of_range& e) {
             cout << "Material not found: " << mat << endl;
             return;
         }
@@ -148,6 +149,116 @@ void CommandLine::add(stringstream& args) {
     } else {
         cout << "Unknown type: " << type << endl;
     }
+
+}
+
+void CommandLine::set(stringstream& args) {
+
+    string type, name, prop;
+
+    try {
+        args >> type >> name >> prop;
+    } catch (const std::out_of_range& e){
+        cout << "Usage: set [type] [name] [property]" << endl;
+    }
+
+    if (type == "light") {
+
+        try {
+            Light* light = lights[name];
+            set(light, prop, args);
+        } catch (const std::out_of_range& e) {
+            cout << "Light not found: " << name << endl;
+            return;
+        }
+
+    } else if (type == "material") {
+
+        try {
+            Material* mat = materials[name];
+            set(mat, prop, args);
+        } catch (const std::out_of_range& e) {
+            cout << "Material not found: " << name << endl;
+            return;
+        }
+
+    } else if (type == "object") {
+
+        try {
+            Object* obj = objects[name];
+            set(obj, prop, args);
+        } catch (const std::out_of_range& e) {
+            cout << "Object not found: " << name << endl;
+            return;
+        }
+
+    } else {
+        cout << "Unknown type: " << type << endl;
+    }
+
+}
+
+void CommandLine::set(Light* light, string prop, stringstream& args) {
+
+    if (prop == "intensity") {
+
+        try {
+            float a, b, c;
+            args >> a >> b >> c;
+            glm::vec3 value = glm::vec3(a, b, c);
+            // light->setRadiance(value);
+        } catch (std::out_of_range& e) {
+            cout << "Usage: set light [name] intensity [r] [g] [b]" << endl;
+        }
+
+    } else {
+        cout << "Unknown property: " << prop << endl;
+    }
+
+}
+
+void CommandLine::set(Material* material, string prop, stringstream& args) {
+
+    if (prop == "reflectance") {
+
+        try {
+            float x;
+            args >> x;
+            material->setReflectance(x);
+        } catch (std::out_of_range& e) {
+            cout << "Usage: set material [name] reflectance [value]" << endl;
+        }
+
+        
+    } else if (prop == "transmittance") {
+
+        try {
+            float x;
+            args >> x;
+            material->setTransmittance(x);
+        } catch (std::out_of_range& e) {
+            cout << "Usage: set material [name] transmittance [value]" << endl;
+        }
+
+    } else if (prop == "ior") {
+
+        try {
+            float x;
+            args >> x;
+            material->setIOR(x);
+        } catch (std::out_of_range& e) {
+            cout << "Usage: set material [name] ior [value]" << endl;
+        }
+
+    } else {
+        cout << "Unknown property: " << prop << endl;
+    }
+
+}
+
+void CommandLine::set(Object* object, string prop, stringstream& args) {
+
+    // none yet
 
 }
 
