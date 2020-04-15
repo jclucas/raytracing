@@ -5,7 +5,7 @@
 
 #include "bounding.h"
 
-class Object;
+class Primitive;
 
 using std::vector;
 
@@ -13,11 +13,12 @@ class Node {
 
     private:
         BoundingBox bound;
-        Node *front, *rear;
-        vector<Object*> contents;
+        Node *front = nullptr, *rear = nullptr;
+        vector<Primitive*> contents;
 
     public:
-        Node(vector<Object*> list);
+        Node(vector<Primitive*>& list);
+        void insert(Primitive* obj);
 
 };
 
@@ -27,6 +28,7 @@ class KDTree {
         Node* root;
 
     public:
-        KDTree(vector<Object*> list);
+        KDTree(vector<Primitive*>& list);
+        void insert(Primitive* obj);
         
 };

@@ -132,6 +132,19 @@ float Sphere::intersect(glm::vec3 origin, glm::vec3 direction) {
 
 }
 
+bool Sphere::intersect(BoundingBox& bounds) {
+
+    // use aabb intersection
+    for (int i = 0; i < 3; i++) {
+        if (this->bound.min[i] > bounds.max[i] || this->bound.max[i] < bounds.min[i]) {
+            return false;
+        }
+    }
+
+    return true;
+
+}
+
 /**
  * Get the surface normal vector at a given point.
  * @param point point on the surface
@@ -194,6 +207,19 @@ float Triangle::intersect(glm::vec3 origin, glm::vec3 direction) {
     } else {
         return INFINITY;
     }
+
+}
+
+bool Triangle::intersect(BoundingBox& bounds) {
+
+    // use aabb intersection
+    for (int i = 0; i < 3; i++) {
+        if (this->bound.min[i] > bounds.max[i] || this->bound.max[i] < bounds.min[i]) {
+            return false;
+        }
+    }
+
+    return true;
 
 }
 

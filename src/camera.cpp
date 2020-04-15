@@ -1,3 +1,4 @@
+#include <iostream>
 #include <glm/trigonometric.hpp>
 #include <glm/geometric.hpp>
 #include <glm/vec2.hpp>
@@ -33,12 +34,12 @@ Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up) {
  */
 glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
 
-    // create k-d tree
-    scene.generateTree();
-
     // transform scene to camera space    
     scene.transform(m);
     position = m * glm::vec4(position, 0);
+
+    // create k-d tree
+    scene.generateTree();
 
     // create framebuffer
     glm::vec3 *frame = new glm::vec3[height * width];
@@ -56,6 +57,8 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
     glm::vec4 ul = glm::vec4(center, 0);
     ul -= (float(width) / 2 - 0.5f) * dw;
     ul -= (float(height) / 2 - 0.5f) * dh;
+
+    std::cout << "rendering..." << std::endl;
 
     glm::vec3 dir;
     for (size_t i = 0; i < height; i++) {

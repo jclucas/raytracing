@@ -45,6 +45,7 @@ class Primitive : public Object {
 
     public:
         virtual float intersect(glm::vec3 origin, glm::vec3 direction) = 0;
+        virtual bool intersect(BoundingBox& bounds) = 0;
         virtual glm::vec3 getNormal(glm::vec3 point) = 0;
         glm::vec3 getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene, int depth);
         virtual vector<Primitive*>* getPrimitives() override;
@@ -63,6 +64,7 @@ class Sphere : public Primitive {
     public:
         Sphere(glm::vec3 position, float radius, Material *material);
         float intersect(glm::vec3 origin, glm::vec3 direction) override;
+        virtual bool intersect(BoundingBox& bounds) override;
         virtual glm::vec3 getNormal(glm::vec3 point) override;
 
 };
@@ -82,6 +84,7 @@ class Triangle : public Primitive {
         Triangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, Material *material);
         void transform(glm::mat4 m) override;
         float intersect(glm::vec3 origin, glm::vec3 direction) override;
+        virtual bool intersect(BoundingBox& bounds) override;
         virtual glm::vec3 getNormal(glm::vec3 point) override;
 
 };

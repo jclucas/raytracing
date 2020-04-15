@@ -1,4 +1,5 @@
 #include <vector>
+#include <ctime>
 #include <glm/vec3.hpp>
 
 #include "scene.h"
@@ -58,7 +59,15 @@ void Scene::generateTree() {
         prims.insert(prims.end(), obj->begin(), obj->end());
     }
 
-    // tree = new KDTree(objects);
+    // start clock
+    std::clock_t start = std::clock();
+
+    // generate tree
+    tree = new KDTree(prims);
+
+    double duration = std::difftime(std::clock(), start) / (double) CLOCKS_PER_SEC;
+    cout << "k-d tree generated after " << duration << " seconds.\n";
+
 }
 
 /**
@@ -89,6 +98,7 @@ Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
     float min = INFINITY;
     int index = -1;
 
+    // KD TREE HERE!!!
     // find closest intersection
     for (size_t i = 0; i < prims.size(); i++) {
         if ((dist = prims[i]->intersect(origin, direction)) < min && dist > 0) {

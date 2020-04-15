@@ -30,6 +30,11 @@ BoundingBox::BoundingBox(vector<BoundingBox> boxes) {
     }
 }
 
+void BoundingBox::expand(glm::vec3 other) {
+    min = glm::min(min, other);
+    max = glm::max(max, other);
+}
+
 void BoundingBox::expand(BoundingBox& other) {
     min = glm::min(min, other.min);
     max = glm::max(max, other.max);

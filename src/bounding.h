@@ -13,6 +13,7 @@ class BoundingBox {
         BoundingBox(glm::vec3 min, glm::vec3 max);
         BoundingBox(vector<glm::vec3>);
         BoundingBox(vector<BoundingBox> boxes);
+        void expand(glm::vec3 other);
         void expand(BoundingBox& other);
 
 };
