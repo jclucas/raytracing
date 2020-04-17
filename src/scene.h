@@ -22,14 +22,13 @@ class Scene {
         vector<Object*> objects;
         glm::vec3 background;
         KDTree* tree;
-        // temp field to emulate kd tree
-        vector<Primitive*> prims;
 
     public:
         Scene(glm::vec3 background);
         vector<Light*>* getLights();
+        vector<Primitive*>* getPrimitives();
         void transform(glm::mat4 m);
-        void generateTree();
+        void generateTree(vector<Primitive*>* prims);
         void add(Light& light);
         void add(Object& object);
         Hit cast(glm::vec3 origin, glm::vec3 direction);

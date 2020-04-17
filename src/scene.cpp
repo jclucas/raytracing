@@ -45,19 +45,25 @@ void Scene::transform(glm::mat4 m) {
 
 }
 
-/**
- * Create K-D tree for rendering.
- */
-void Scene::generateTree() {
+vector<Primitive*>* Scene::getPrimitives() {
 
-    prims = vector<Primitive*>();
+    vector<Primitive*>* prims = new vector<Primitive*>();
 
     // iterate through scene objects, adding primitives to list
     vector<Primitive*>* obj;
     for (auto it = objects.begin(); it != objects.end(); it++) {
         obj = (*it)->getPrimitives();
-        prims.insert(prims.end(), obj->begin(), obj->end());
+        prims->insert(prims->end(), obj->begin(), obj->end());
     }
+
+    return prims;
+
+}
+
+/**
+ * Create K-D tree for rendering.
+ */
+void Scene::generateTree(vector<Primitive*>* prims) {
 
     // start clock
     std::clock_t start = std::clock();
@@ -93,26 +99,7 @@ void Scene::add(Object &object) {
  * @return pointer to intersected object or null pointer
  */
 Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
-    
-    float dist;
-    float min = INFINITY;
-    int index = -1;
-
-    // KD TREE HERE!!!
-    // find closest intersection
-    for (size_t i = 0; i < prims.size(); i++) {
-        if ((dist = prims[i]->intersect(origin, direction)) < min && dist > 0) {
-            min = dist;
-            index = i;
-        }
-    }
-
-    // create return value
-    Hit hit;
-    hit.object = (index >= 0)? prims[index] : nullptr;
-    hit.point = origin + direction * min;
-    return hit;
-
+    return tree->intersect(origin, direction);
 }
 
 glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {

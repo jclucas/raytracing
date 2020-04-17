@@ -17,3 +17,13 @@ class BoundingBox {
         void expand(BoundingBox& other);
 
 };
+
+class Plane {
+
+    public:
+        glm::vec3 normal;
+        float d;
+        Plane(glm::vec3 normal, float d);
+        float intersect(glm::vec3 origin, glm::vec3 direction);
+
+};
