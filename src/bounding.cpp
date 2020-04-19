@@ -1,4 +1,5 @@
 #include <glm/common.hpp>
+#include <iostream>
 
 #include "bounding.h"
 #include "object.h"
@@ -41,6 +42,13 @@ void BoundingBox::expand(BoundingBox& other) {
     max = glm::max(max, other.max);
 }
 
+bool BoundingBox::intersect(BoundingBox& other) {
+    return (min.x <= other.max.x && max.x >= other.min.x) &&
+           (min.y <= other.max.y && max.y >= other.min.y) &&
+           (min.z <= other.max.z && max.z >= other.min.z);
+
+}
+
 
 // BOUNDING PLANE
 
@@ -54,8 +62,8 @@ float Plane::intersect(glm::vec3 origin, glm::vec3 direction) {
     // check if parallel
     float denom = glm::dot(normal, direction);
 
-    if (abs(denom) < EPSILON) {
-        return (d > glm::dot(origin, normal)) ? INFINITY : -INFINITY;
+    if (glm::abs(denom) < EPSILON) {
+        return INFINITY;
     }
 
     return (d - glm::dot(origin, normal)) / denom;

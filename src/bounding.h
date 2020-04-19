@@ -15,6 +15,7 @@ class BoundingBox {
         BoundingBox(vector<BoundingBox> boxes);
         void expand(glm::vec3 other);
         void expand(BoundingBox& other);
+        bool intersect(BoundingBox& other);
 
 };
 

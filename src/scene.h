@@ -22,6 +22,7 @@ class Scene {
         vector<Object*> objects;
         glm::vec3 background;
         KDTree* tree;
+        vector<Primitive*>* prims;
 
     public:
         Scene(glm::vec3 background);

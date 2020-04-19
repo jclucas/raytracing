@@ -70,9 +70,11 @@ void Scene::generateTree(vector<Primitive*>* prims) {
 
     // generate tree
     tree = new KDTree(prims);
+    // temp for comparing performance
+    this->prims = prims;
 
     double duration = std::difftime(std::clock(), start) / (double) CLOCKS_PER_SEC;
-    cout << "k-d tree generated after " << duration << " seconds.\n";
+    cout << "k-d tree generated after " << duration << " seconds." << endl;
 
 }
 
@@ -99,7 +101,27 @@ void Scene::add(Object &object) {
  * @return pointer to intersected object or null pointer
  */
 Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
+    
     return tree->intersect(origin, direction);
+
+    // float dist;
+    // float min = INFINITY;
+    // int index = -1;
+
+    // // find closest intersection
+    // for (size_t i = 0; i < prims->size(); i++) {
+    //     if ((dist = (*prims)[i]->intersect(origin, direction)) < min && dist > 0) {
+    //         min = dist;
+    //         index = i;
+    //     }
+    // }
+
+    // // create return value
+    // Hit hit;
+    // hit.object = (index >= 0)? (*prims)[index] : nullptr;
+    // hit.point = origin + direction * min;
+    // return hit;
+
 }
 
 glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {

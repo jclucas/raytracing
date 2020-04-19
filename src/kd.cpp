@@ -11,8 +11,14 @@ using std::endl;
 
 KDTree::KDTree(vector<Primitive*>* list) {
 
+    BoundingBox bound = BoundingBox();
+
+    for (auto it = list->begin(); it != list->end(); it++) {
+        bound.expand((*it)->getBounds());
+    }
+
     // generate bvh
-    root = new Node(list);
+    root = new Node(list, bound);
 
     // insert primitives
     for (auto it = list->begin(); it != list->end(); it++) {
@@ -32,21 +38,17 @@ Hit KDTree::intersect(glm::vec3 origin, glm::vec3 direction) {
 /**
  * Recursively create a bounding hierarchy for a given set of primitives.
  */
-Node::Node(vector<Primitive*>* list) {
+Node::Node(vector<Primitive*>* list, BoundingBox bound) {
 
     // create bounding box
-    bound = BoundingBox();
+    this->bound = bound;
     BoundingBox centers = BoundingBox();
 
     for (auto it = list->begin(); it != list->end(); it++) {
-        bound.expand((*it)->getBounds());
         centers.expand((*it)->getPosition());
     }
 
-    std::cout << "contains " << list->size() << " objects. " << std::endl;
-
     // get largest axis
-    // glm::vec3 size = bound.max - bound.min;
     glm::vec3 size = centers.max - centers.min;
     int axis = (size.x > size.y) && (size.x > size.z) ? 0 : (size.y > size.z) ? 1 : 2;
     glm::vec3 normal;
@@ -65,11 +67,8 @@ Node::Node(vector<Primitive*>* list) {
 
     // recursion base case
     if (list->size() < 3 || size[axis] < EPSILON) {
-        // copy list to leaf node
-        // for (auto it = list.begin(); it != list.end(); it++) {
-        //     contents.push_back(*it);
-        // }
-        std::cout << "terminating." << std::endl;
+        // node is a leaf
+        contents = new vector<Primitive*>();
         return;
     }
 
@@ -77,11 +76,15 @@ Node::Node(vector<Primitive*>* list) {
     vector<Primitive*>* front = new vector<Primitive*>();
     vector<Primitive*>* rear = new vector<Primitive*>();
     float position = centers.min[axis] + size[axis] / 2.0f;
-    
-    // TODO: remove locals ?
     this->plane = new Plane(normal, position);
 
-    std::cout << "partitioning at " << position << " on axis " << axis << "." << std::endl;
+    // divide bounding box along plane
+    glm::vec3 midmin = bound.min;
+    glm::vec3 midmax = bound.max;
+    midmin[axis] = position;
+    midmax[axis] = position;
+    BoundingBox rearBound = BoundingBox(bound.min, midmax);
+    BoundingBox frontBound = BoundingBox(midmin, bound.max);
     float test = 0;
 
     for (auto it = list->begin(); it != list->end(); it++) {
@@ -90,9 +93,9 @@ Node::Node(vector<Primitive*>* list) {
     }
 
     // create front & back nodes
-    this->front = new Node(front);
+    this->front = new Node(front, frontBound);
     delete front;
-    this->rear = new Node(rear);    
+    this->rear = new Node(rear, rearBound);    
     delete rear;
 
 }
@@ -105,7 +108,7 @@ void Node::insert(Primitive* obj) {
 
     // if leaf node, store
     if (isLeaf()) {
-        contents.push_back(obj);
+        contents->push_back(obj);
         return;
     }
 
@@ -114,11 +117,10 @@ void Node::insert(Primitive* obj) {
     }
 
     if (rear != nullptr && obj->intersect(rear->bound)) {
-        front->insert(obj);
+        rear->insert(obj);
     }
 
 }
-
 
 Hit Node::intersect(glm::vec3 origin, glm::vec3 direction) {
     
@@ -130,8 +132,8 @@ Hit Node::intersect(glm::vec3 origin, glm::vec3 direction) {
         int index = -1;
 
         // find closest intersection
-        for (size_t i = 0; i < contents.size(); i++) {
-            if ((dist = contents[i]->intersect(origin, direction)) < min && dist > 0) {
+        for (size_t i = 0; i < contents->size(); i++) {
+            if ((dist = (*contents)[i]->intersect(origin, direction)) < min && dist > 0) {
                 min = dist;
                 index = i;
             }
@@ -139,58 +141,35 @@ Hit Node::intersect(glm::vec3 origin, glm::vec3 direction) {
 
         // create return value
         Hit hit;
-        hit.object = (index >= 0)? contents[index] : nullptr;
+        hit.object = (index >= 0)? (*contents)[index] : nullptr;
         hit.point = origin + direction * min;
         return hit;
 
     }
 
     // recursive case: traverse nearer branch first
-    float dist = plane->intersect(origin, direction); // intersect ray/plane
+    float dist = plane->intersect(origin, direction);
 
-    // parallel: traverse only current side
-    if (dist == INFINITY) {
-        return front->intersect(origin, direction);
-    } else if (dist == -INFINITY) {
-        return rear->intersect(origin, direction);
+    // get axis index
+    // TODO: save?
+    int axis = (plane->normal.x > plane->normal.y) && (plane->normal.x > plane->normal.z) ? 0 : (plane->normal.y > plane->normal.z) ? 1 : 2;
+    
+    // which direction are we crossing the plane?
+    bool frontFirst = origin[axis] > plane->d;
+
+    // check first side
+    Hit returnVal = (frontFirst) ? front->intersect(origin, direction) : rear->intersect(origin, direction);
+
+    // TODO: debug
+    if (dist == INFINITY || dist < 0) {
+        // if parallel or moving away, only check current side
+        return returnVal;
+    } else if (returnVal.object == nullptr) {
+        // if we haven't hit anything yet, check second side
+        return (frontFirst) ? rear->intersect(origin, direction) : front->intersect(origin, direction);
     } else {
-
-        Hit returnVal;
-
-        if (dist < 0) { 
-            returnVal = rear->intersect(origin, direction);
-            return (returnVal.object == nullptr) ? front->intersect(origin, direction) : returnVal;
-        } else {
-            returnVal = front->intersect(origin, direction);
-            return (returnVal.object == nullptr) ? rear->intersect(origin, direction) : returnVal;
-        }
-
+        // we didn't hit anything
+        return returnVal;
     }
 
-
 }
-
-/**
- * Insert a set of objects into the tree.
- */
-// template <typename T>
-// void KDTree<T>::insert(vector<T*> ptr) {
-
-//     if (root == nullptr) {
-//         root = new Node<T>;
-//     }
-
-// }
-
-/**
- * Helper method:
- * Recursively insert a set of objects into the tree at a specified level.
- */
-// template <typename T>
-// void insert(vector<T*> ptr, Node* parent) {
-
-//     if (parent == nullptr) {
-//         parent = new Node<T>;
-//     }
-
-// }

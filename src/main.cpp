@@ -21,6 +21,8 @@ int main() {
     // output properties
     const int HEIGHT = 800;
     const int WIDTH = 1280;
+    // const int HEIGHT = 400;
+    // const int WIDTH = 640;
     const std::string FILENAME = "render.ppm";
 
     // scene characteristics
@@ -33,8 +35,8 @@ int main() {
     Phong *reflective = new Phong(glm::vec3(0.8f), glm::vec3(1), 10.0f);
     reflective->setReflectance(0.5);
     Phong *transparent = new Phong(glm::vec3(0.95f), glm::vec3(0.3f), 2.0f);
-    // transparent->setTransmittance(0.8);
-    // transparent->setIOR(0.95);
+    transparent->setTransmittance(0.8);
+    transparent->setIOR(0.95);
     Phong *floor = new Phong(glm::vec3(1, 0.5f, 0), glm::vec3(1), 10.0f);
     floor->add(check);
 
@@ -54,7 +56,7 @@ int main() {
     scene.add(*cube);
     scene.add(*light);
 
-    // ALT SCENE...
+    // ALT SCENE (kd tree test)
     // Scene scene = Scene(glm::vec3(1, 1, .75f));
     // Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
     // Phong *phong = new Phong(glm::vec3(.5f, .5f, 1), glm::vec3(1), 10.0f);
@@ -73,12 +75,12 @@ int main() {
     glm::vec3 *frame = camera.render(HEIGHT, WIDTH, scene);
 
     double duration = std::difftime(std::clock(), start) / (double) CLOCKS_PER_SEC;
-    cout << "finished rendering after " << duration << " seconds.\n";
+    cout << "finished rendering after " << duration << " seconds." << endl;
 
     // save to ppm
     ofstream file;
     file.open(FILENAME);
-    file << "P3 " << WIDTH << " " << HEIGHT << " 255\n";
+    file << "P3 " << WIDTH << " " << HEIGHT << " 255" << endl;
 
     // find maximum intensity component
     float maxval = 1;

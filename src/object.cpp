@@ -135,13 +135,7 @@ float Sphere::intersect(glm::vec3 origin, glm::vec3 direction) {
 bool Sphere::intersect(BoundingBox& bounds) {
 
     // use aabb intersection
-    for (int i = 0; i < 3; i++) {
-        if (this->bound.min[i] > bounds.max[i] || this->bound.max[i] < bounds.min[i]) {
-            return false;
-        }
-    }
-
-    return true;
+    return this->bound.intersect(bounds);
 
 }
 
@@ -196,7 +190,7 @@ float Triangle::intersect(glm::vec3 origin, glm::vec3 direction) {
 
     // parallel
     if (abs(glm::dot(p, e1)) < EPSILON) {
-        return false;
+        return INFINITY;
     }
 
     // distance, u, v
@@ -213,13 +207,7 @@ float Triangle::intersect(glm::vec3 origin, glm::vec3 direction) {
 bool Triangle::intersect(BoundingBox& bounds) {
 
     // use aabb intersection
-    for (int i = 0; i < 3; i++) {
-        if (this->bound.min[i] > bounds.max[i] || this->bound.max[i] < bounds.min[i]) {
-            return false;
-        }
-    }
-
-    return true;
+    return this->bound.intersect(bounds);
 
 }
 
@@ -236,13 +224,6 @@ glm::vec3 Triangle::getNormal(glm::vec3 point) {
  * Calculate axis aligned bounding box.
  */
 void Triangle::setBounds() {
-    // TODO: compare efficiency
-    // bound.min.x = min(a.x, b.x, c.x);
-    // bound.min.y = min(a.y, b.y, c.y);
-    // bound.min.z = min(a.z, b.z, c.z);
-    // bound.max.x = max(a.x, b.x, c.x);
-    // bound.max.y = max(a.y, b.y, c.y);
-    // bound.max.z = max(a.z, b.z, c.z);
     bound = BoundingBox({a, b, c});
 }
 
@@ -287,7 +268,6 @@ vector<Primitive*>* Mesh::getPrimitives() {
 
     glm::mat4 m = getObjectTransform();
     
-    // TODO: copy before transforming?
     for (auto it = components.begin(); it != components.end(); it++) {
         (*it)->transform(m);
     }
@@ -324,15 +304,6 @@ void Mesh::add(glm::vec3 a, glm::vec3 b, glm::vec3 c) {
     Triangle* tri = new Triangle(a, b, c, material);
     components.push_back(tri);
 
-    // recalculate (or set) mesh position
-    // if (components.size() == 1) {
-    //     position = tri->getPosition();
-    // } else {
-    //     float size = (float) components.size();
-    //     position *= (size - 1.0f) / size;
-    //     position += tri->getPosition() / size;
-    // }
-
     // expand bounding box
     bound.expand(tri->getBounds());
     
@@ -346,7 +317,7 @@ void Mesh::read(std::string filename) {
     miniply::PLYReader reader = miniply::PLYReader(filename.c_str());
     
     if (!reader.valid()) {
-        cout << "Invalid file: " << filename << endl;
+        std::cout << "Invalid file: " << filename << endl;
         exit(0);
     }
 
@@ -374,7 +345,7 @@ void Mesh::read(std::string filename) {
     }
 
     if (vertices == nullptr) {
-        cout << "failed to read vertices from " << filename << "." << endl;
+        std::cout << "failed to read vertices from " << filename << "." << endl;
         exit(0);
     }
 
@@ -402,6 +373,6 @@ void Mesh::read(std::string filename) {
     delete[] vertexProps;
     delete[] triProps;
 
-    cout << "read data from " << filename << "." << endl;
+    std::cout << "read data from " << filename << "." << endl;
 
 }

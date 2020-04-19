@@ -16,11 +16,11 @@ class Node {
         BoundingBox bound;
         Plane* plane = nullptr;
         Node *front = nullptr, *rear = nullptr;
-        vector<Primitive*> contents;
+        vector<Primitive*>* contents = nullptr;
         bool isLeaf();
 
     public:
-        Node(vector<Primitive*>* list);
+        Node(vector<Primitive*>* list, BoundingBox bound);
         void insert(Primitive* obj);
         Hit intersect(glm::vec3 origin, glm::vec3 direction);
 
