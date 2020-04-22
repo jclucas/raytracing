@@ -77,15 +77,24 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
 
                 glm::vec3 refract;
                 glm::vec3 norm = n;
+                float dot = glm::dot(-v, n);
                 float ratio = 1.0f / material->getIOR();
                 
                 // check if we are entering or exiting material
-                if (glm::dot(-v, n) > 0) {
+                if (dot > 0) {
                     norm = -norm;
                     ratio = 1.0f / ratio;
                 }
 
-                refract = glm::refract(-v, norm, ratio);
+                float sqrt = 1.0f - ratio * ratio * (1.0f - dot * dot);
+
+                // check for total internal reflection
+                if (sqrt < 0) {
+                    refract = glm::reflect(-v, n);
+                } else {
+                    refract = ratio * -v - (ratio * dot + std::sqrt(sqrt)) * norm;
+                }
+
                 color += material->getTransmittance() * scene.getPixel(point + EPSILON * -norm, refract, depth + 1);
 
             }
