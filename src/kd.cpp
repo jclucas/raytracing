@@ -147,29 +147,26 @@ Hit Node::intersect(glm::vec3 origin, glm::vec3 direction) {
 
     }
 
-    // recursive case: traverse nearer branch first
-    float dist = plane->intersect(origin, direction);
-
     // get axis index
     // TODO: save?
     int axis = (plane->normal.x > plane->normal.y) && (plane->normal.x > plane->normal.z) ? 0 : (plane->normal.y > plane->normal.z) ? 1 : 2;
     
     // which direction are we crossing the plane?
     bool frontFirst = origin[axis] > plane->d;
+    float distFromPlane = origin[axis] - plane->d;
 
     // check first side
     Hit returnVal = (frontFirst) ? front->intersect(origin, direction) : rear->intersect(origin, direction);
 
     // TODO: debug
-    if (dist == INFINITY || dist < 0) {
+    if (glm::abs(direction[axis]) < EPSILON || ((distFromPlane < 0) == (direction[axis] < 0))) {
         // if parallel or moving away, only check current side
         return returnVal;
-    } else if (returnVal.object == nullptr) {
+    } else if (returnVal.object != nullptr) {
+        return returnVal;
+    } else {
         // if we haven't hit anything yet, check second side
         return (frontFirst) ? rear->intersect(origin, direction) : front->intersect(origin, direction);
-    } else {
-        // we didn't hit anything
-        return returnVal;
     }
 
 }
