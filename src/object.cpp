@@ -52,7 +52,12 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
         // cast shadow vector
         Hit shadow = scene.cast(point + EPSILON * n, s);
         float dist = glm::length((*i)->getPosition() - point);
-        if (shadow.object == nullptr || dist < glm::length (shadow.point - point)) { 
+
+        // TODO: encapsulation
+        if (shadow.object != nullptr && shadow.object->material->getTransmittance() < 1.0f) {
+            glm::vec3 r = glm::reflect(-s, n);
+            color += shadow.object->material->getTransmittance() * material->getColor(objPoint, n, s, r, v, **i);
+        } else if (shadow.object == nullptr || dist < glm::length (shadow.point - point)) { 
             glm::vec3 r = glm::reflect(-s, n);
             color += material->getColor(objPoint, n, s, r, v, **i);
         }
