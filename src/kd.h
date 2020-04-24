@@ -22,7 +22,7 @@ class Node {
         BoundingBox bound;
         Node(vector<Primitive*>* list, BoundingBox bound);
         void insert(Primitive* obj);
-        Hit intersect(glm::vec3 origin, glm::vec3 direction);
+        Hit intersect(glm::vec3 origin, glm::vec3 direction, float a, float b);
 
 };
 

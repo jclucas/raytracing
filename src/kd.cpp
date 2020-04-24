@@ -33,8 +33,24 @@ void KDTree::insert(Primitive* obj) {
 
 Hit KDTree::intersect(glm::vec3 origin, glm::vec3 direction) {
 
+    // find signed distances
+    float a = -INFINITY;
+    float b = INFINITY;
+
+    for (int i = 0; i < 3; i++) {
+
+        if (direction[i] >= 0) {
+            a = max(a, (root->bound.min[i] - origin[i]) / direction[i]);
+            b = min(b, (root->bound.max[i] - origin[i]) / direction[i]);
+        } else {
+            a = max(a, (root->bound.max[i] - origin[i]) / direction[i]);
+            b = min(b, (root->bound.min[i] - origin[i]) / direction[i]);
+        }
+        
+    }
+
     // start recursive traversal
-    return root->intersect(origin, direction);
+    return root->intersect(origin, direction, a, b);
 }
 
 /**
@@ -124,9 +140,7 @@ void Node::insert(Primitive* obj) {
 
 }
 
-Hit Node::intersect(glm::vec3 origin, glm::vec3 direction) {
-    
-    // glm::vec3 direction = glm::normalize(b - a);
+Hit Node::intersect(glm::vec3 origin, glm::vec3 direction, float a, float b) {
     
     // base case: test intersection
     if (isLeaf()) {
@@ -158,42 +172,21 @@ Hit Node::intersect(glm::vec3 origin, glm::vec3 direction) {
     // which direction are we crossing the plane?
     float distFromPlane = origin[axis] - plane->d;
     bool originInFront = distFromPlane > 0;
-
-    // check first side
-    Hit returnVal = (originInFront) ? front->intersect(origin, direction) : rear->intersect(origin, direction);
-
-
-    // find signed distances
-    float a = -INFINITY;
-    float b = INFINITY;
-
-    for (int i = 0; i < 3; i++) {
-
-        if (direction[i] >= 0) {
-            a = max(a, (bound.min[i] - origin[i]) / direction[i]);
-            b = min(b, (bound.max[i] - origin[i]) / direction[i]);
-        } else {
-            a = max(a, (bound.max[i] - origin[i]) / direction[i]);
-            b = min(b, (bound.min[i] - origin[i]) / direction[i]);
-        }
-        
-    }
-
     float s = (plane->d - origin[axis]) / direction[axis]; 
     
-    if (s < 0 || s > b){ // || glm::abs(direction[axis]) < EPSILON) {
+    if (s < 0 || s > b || glm::abs(direction[axis]) < EPSILON) {
         // traverse near node
-        return (originInFront) ? front->intersect(origin, direction) : rear->intersect(origin, direction);
+        return (originInFront) ? front->intersect(origin, direction, a, b) : rear->intersect(origin, direction, a, b);
 
     } else if (s < a) {
         // traverse far node
-        return (originInFront) ? rear->intersect(origin, direction) : front->intersect(origin, direction);
+        return (originInFront) ? rear->intersect(origin, direction, a, b) : front->intersect(origin, direction, a, b);
     } else {
         // traverse both, near->far
         
-        Hit near = (originInFront) ? front->intersect(origin, direction) : rear->intersect(origin, direction);
+        Hit near = (originInFront) ? front->intersect(origin, direction, a, s) : rear->intersect(origin, direction, a, s);
         if (near.object == nullptr) {
-            return (originInFront) ? rear->intersect(origin, direction) : front->intersect(origin, direction);
+            return (originInFront) ? rear->intersect(origin, direction, s, b) : front->intersect(origin, direction, s, b);
         } else {
             return near;
         }
