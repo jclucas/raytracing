@@ -1,18 +1,18 @@
 #include <vector>
-// temp
-#include <iostream>
 
 #include "kd.h"
 #include "object.h"
 
 using std::vector;
-using std::cout;
-using std::endl;
 
+/**
+ * Create a BVH of a set of primitives.
+ * @param list primitives to be contained in tree
+ */
 KDTree::KDTree(vector<Primitive*>* list) {
 
+    // calculate initial bounding box
     BoundingBox bound = BoundingBox();
-
     for (auto it = list->begin(); it != list->end(); it++) {
         bound.expand((*it)->getBounds());
     }
@@ -27,16 +27,28 @@ KDTree::KDTree(vector<Primitive*>* list) {
 
 }
 
+/**
+ * Insert a primitive into the tree.
+ * @param obj primitive to insert
+ */
 void KDTree::insert(Primitive* obj) {
     root->insert(obj);
 }
 
+
+/**
+ * Perform an intersection test on the tree.
+ * @param origin ray origin
+ * @param direction ray direction
+ * @return nearest intersection along ray
+ */
 Hit KDTree::intersect(glm::vec3 origin, glm::vec3 direction) {
 
     // find signed distances
     float a = -INFINITY;
     float b = INFINITY;
 
+    // for each axis
     for (int i = 0; i < 3; i++) {
 
         if (direction[i] >= 0) {
@@ -55,6 +67,8 @@ Hit KDTree::intersect(glm::vec3 origin, glm::vec3 direction) {
 
 /**
  * Recursively create a bounding hierarchy for a given set of primitives.
+ * @param list primitives to be contained in subtree
+ * @param bound bounding box to be divided
  */
 Node::Node(vector<Primitive*>* list, BoundingBox bound) {
 
@@ -105,6 +119,7 @@ Node::Node(vector<Primitive*>* list, BoundingBox bound) {
     BoundingBox frontBound = BoundingBox(midmin, bound.max);
     float test = 0;
 
+    // partition list of primitives by position
     for (auto it = list->begin(); it != list->end(); it++) {
         test = (*it)->getPosition()[axis];
         test > position ? front->push_back(*it) : rear->push_back(*it);
@@ -118,10 +133,17 @@ Node::Node(vector<Primitive*>* list, BoundingBox bound) {
 
 }
 
+/**
+ * @return true if the node is a leaf node
+ */
 bool Node::isLeaf() {
     return (front == nullptr && rear == nullptr);
 }
 
+/**
+ * Recursively insert a primitive into the subtree.
+ * @param obj primitive to insert
+ */
 void Node::insert(Primitive* obj) {
 
     // if leaf node, store
@@ -140,6 +162,14 @@ void Node::insert(Primitive* obj) {
 
 }
 
+/**
+ * Recursively perform an intersection test on the subtree.
+ * @param origin ray origin
+ * @param direction ray direction
+ * @param a signed distance along ray of first intersection
+ * @param b signed distance along ray of second intersection
+ * @return nearest intersection along ray in subtree
+ */
 Hit Node::intersect(glm::vec3 origin, glm::vec3 direction, float a, float b) {
     
     // base case: test intersection
@@ -170,21 +200,20 @@ Hit Node::intersect(glm::vec3 origin, glm::vec3 direction, float a, float b) {
     int axis = (plane->normal.x > plane->normal.y) && (plane->normal.x > plane->normal.z) ? 0 : (plane->normal.y > plane->normal.z) ? 1 : 2;
     
     // which direction are we crossing the plane?
-    float distFromPlane = origin[axis] - plane->d;
-    bool originInFront = distFromPlane > 0;
+    bool originInFront = origin[axis] > plane->d;
     float s = (plane->d - origin[axis]) / direction[axis]; 
     
     if (s < 0 || s > b || glm::abs(direction[axis]) < EPSILON) {
         // traverse near node
         return (originInFront) ? front->intersect(origin, direction, a, b) : rear->intersect(origin, direction, a, b);
-
     } else if (s < a) {
         // traverse far node
         return (originInFront) ? rear->intersect(origin, direction, a, b) : front->intersect(origin, direction, a, b);
     } else {
-        // traverse both, near->far
         
+        // traverse both, near->far
         Hit near = (originInFront) ? front->intersect(origin, direction, a, s) : rear->intersect(origin, direction, a, s);
+        
         if (near.object == nullptr) {
             return (originInFront) ? rear->intersect(origin, direction, s, b) : front->intersect(origin, direction, s, b);
         } else {

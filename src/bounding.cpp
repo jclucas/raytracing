@@ -4,6 +4,8 @@
 #include "bounding.h"
 #include "object.h"
 
+// AXIS ALIGNED BOUNDING BOX
+
 BoundingBox::BoundingBox() { 
     min = glm::vec3(INFINITY);
     max = glm::vec3(-INFINITY);
@@ -46,11 +48,10 @@ bool BoundingBox::intersect(BoundingBox& other) {
     return (min.x <= other.max.x && max.x >= other.min.x) &&
            (min.y <= other.max.y && max.y >= other.min.y) &&
            (min.z <= other.max.z && max.z >= other.min.z);
-
 }
 
 
-// BOUNDING PLANE
+// AXIS ALIGNED PLANE
 
 Plane::Plane(glm::vec3 normal, float d) {
     this->normal = normal;

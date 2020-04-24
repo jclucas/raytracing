@@ -42,10 +42,10 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
     glm::vec3 r;
     glm::vec3 objPoint = inverseTransform(point);
 
-    vector<Light*>* lights = scene.getLights();
+    vector<Light*> lights = scene.getLights();
 
     // iterate through lights
-    for (vector<Light*>::iterator i = lights->begin(); i != lights->end(); i++) {
+    for (vector<Light*>::iterator i = lights.begin(); i != lights.end(); i++) {
 
         glm::vec3 s = glm::normalize((*i)->getPosition() - point);
 
@@ -67,7 +67,6 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
 
             // reflection
             if (material->getReflectance() > 0) {
-                // TODO: better sampling
                 glm::vec3 reflect = glm::reflect(-v, n);
                 color += material->getReflectance() * scene.getPixel(point + EPSILON * n, reflect, depth + 1);
             }
@@ -109,6 +108,7 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
 }
 
 vector<Primitive*>* Primitive::getPrimitives() {
+    // TODO: memory management
     auto v = new vector<Primitive*>();
     v->push_back(this);
     return v;
@@ -148,10 +148,8 @@ float Sphere::intersect(glm::vec3 origin, glm::vec3 direction) {
 }
 
 bool Sphere::intersect(BoundingBox& bounds) {
-
     // use aabb intersection
     return this->bound.intersect(bounds);
-
 }
 
 /**
@@ -191,8 +189,6 @@ void Triangle::transform(glm::mat4 m) {
     position = (a + b + c) / 3.0f;
     invWorldMatrix =  invWorldMatrix * glm::inverse(m);
     setBounds();
-    // cout << "min: (" << bound.min.x << ", " << bound.min.y << ", " << bound.min.z << ")\n";
-    // cout << "max: (" << bound.max.x << ", " << bound.max.y << ", " << bound.max.z << ")" << std::endl;
 }
 
 float Triangle::intersect(glm::vec3 origin, glm::vec3 direction) {
@@ -220,10 +216,8 @@ float Triangle::intersect(glm::vec3 origin, glm::vec3 direction) {
 }
 
 bool Triangle::intersect(BoundingBox& bounds) {
-
     // use aabb intersection
     return this->bound.intersect(bounds);
-
 }
 
 /**

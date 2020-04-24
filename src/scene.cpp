@@ -1,17 +1,12 @@
 #include <vector>
 #include <ctime>
+#include <iostream>
 #include <glm/vec3.hpp>
 
 #include "scene.h"
 #include "kd.h"
 #include "object.h"
 #include "light.h"
-
-// temp
-#include <iostream>
-
-// TODO: change
-using namespace std;
 
 /**
  * Construct an empty scene.
@@ -24,9 +19,11 @@ Scene::Scene(glm::vec3 background) {
     this->tree = nullptr;
 }
 
-
-vector<Light*>* Scene::getLights() {
-    return &lights;
+/**
+ * Get scene lights.
+ */
+vector<Light*>& Scene::getLights() {
+    return lights;
 }
 
 /**
@@ -45,6 +42,10 @@ void Scene::transform(glm::mat4 m) {
 
 }
 
+/**
+ * Create a list of renderable primitives from all scene objects.
+ * @return pointer to primitives list
+ */
 vector<Primitive*>* Scene::getPrimitives() {
 
     vector<Primitive*>* prims = new vector<Primitive*>();
@@ -70,9 +71,6 @@ void Scene::generateTree(vector<Primitive*>* prims) {
 
     // generate tree
     tree = new KDTree(prims);
-    // temp for comparing performance
-    this->prims = prims;
-
     double duration = std::difftime(std::clock(), start) / (double) CLOCKS_PER_SEC;
     cout << "k-d tree generated after " << duration << " seconds." << endl;
 
@@ -101,29 +99,15 @@ void Scene::add(Object &object) {
  * @return pointer to intersected object or null pointer
  */
 Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
-    
     return tree->intersect(origin, direction);
-
-    // float dist;
-    // float min = INFINITY;
-    // int index = -1;
-
-    // // find closest intersection
-    // for (size_t i = 0; i < prims->size(); i++) {
-    //     if ((dist = (*prims)[i]->intersect(origin, direction)) < min && dist > 0) {
-    //         min = dist;
-    //         index = i;
-    //     }
-    // }
-
-    // // create return value
-    // Hit hit;
-    // hit.object = (index >= 0)? (*prims)[index] : nullptr;
-    // hit.point = origin + direction * min;
-    // return hit;
-
 }
 
+/**
+ * Get an illuminance value by casting a ray into the scene.
+ * @param origin origin of the ray
+ * @param direction direction of the ray
+ * @return pixel "color"
+ */
 glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
     
     Hit hit = cast(origin, direction);

@@ -22,11 +22,10 @@ class Scene {
         vector<Object*> objects;
         glm::vec3 background;
         KDTree* tree;
-        vector<Primitive*>* prims;
 
     public:
         Scene(glm::vec3 background);
-        vector<Light*>* getLights();
+        vector<Light*>& getLights();
         vector<Primitive*>* getPrimitives();
         void transform(glm::mat4 m);
         void generateTree(vector<Primitive*>* prims);
