@@ -13,13 +13,13 @@ using std::vector;
 class Node {
 
     private:
-        BoundingBox bound;
         Plane* plane = nullptr;
         Node *front = nullptr, *rear = nullptr;
         vector<Primitive*>* contents = nullptr;
         bool isLeaf();
 
     public:
+        BoundingBox bound;
         Node(vector<Primitive*>* list, BoundingBox bound);
         void insert(Primitive* obj);
         Hit intersect(glm::vec3 origin, glm::vec3 direction);

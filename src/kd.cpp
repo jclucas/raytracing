@@ -32,6 +32,8 @@ void KDTree::insert(Primitive* obj) {
 }
 
 Hit KDTree::intersect(glm::vec3 origin, glm::vec3 direction) {
+
+    // start recursive traversal
     return root->intersect(origin, direction);
 }
 
@@ -124,6 +126,8 @@ void Node::insert(Primitive* obj) {
 
 Hit Node::intersect(glm::vec3 origin, glm::vec3 direction) {
     
+    // glm::vec3 direction = glm::normalize(b - a);
+    
     // base case: test intersection
     if (isLeaf()) {
 
@@ -152,21 +156,48 @@ Hit Node::intersect(glm::vec3 origin, glm::vec3 direction) {
     int axis = (plane->normal.x > plane->normal.y) && (plane->normal.x > plane->normal.z) ? 0 : (plane->normal.y > plane->normal.z) ? 1 : 2;
     
     // which direction are we crossing the plane?
-    bool frontFirst = origin[axis] > plane->d;
     float distFromPlane = origin[axis] - plane->d;
+    bool originInFront = distFromPlane > 0;
 
     // check first side
-    Hit returnVal = (frontFirst) ? front->intersect(origin, direction) : rear->intersect(origin, direction);
+    Hit returnVal = (originInFront) ? front->intersect(origin, direction) : rear->intersect(origin, direction);
 
-    // TODO: debug
-    if (glm::abs(direction[axis]) < EPSILON || ((distFromPlane < 0) == (direction[axis] < 0))) {
-        // if parallel or moving away, only check current side
-        return returnVal;
-    } else if (returnVal.object != nullptr) {
-        return returnVal;
+
+    // find signed distances
+    float a = -INFINITY;
+    float b = INFINITY;
+
+    for (int i = 0; i < 3; i++) {
+
+        if (direction[i] >= 0) {
+            a = max(a, (bound.min[i] - origin[i]) / direction[i]);
+            b = min(b, (bound.max[i] - origin[i]) / direction[i]);
+        } else {
+            a = max(a, (bound.max[i] - origin[i]) / direction[i]);
+            b = min(b, (bound.min[i] - origin[i]) / direction[i]);
+        }
+        
+    }
+
+    float s = (plane->d - origin[axis]) / direction[axis]; 
+    
+    if (s < 0 || s > b){ // || glm::abs(direction[axis]) < EPSILON) {
+        // traverse near node
+        return (originInFront) ? front->intersect(origin, direction) : rear->intersect(origin, direction);
+
+    } else if (s < a) {
+        // traverse far node
+        return (originInFront) ? rear->intersect(origin, direction) : front->intersect(origin, direction);
     } else {
-        // if we haven't hit anything yet, check second side
-        return (frontFirst) ? rear->intersect(origin, direction) : front->intersect(origin, direction);
+        // traverse both, near->far
+        
+        Hit near = (originInFront) ? front->intersect(origin, direction) : rear->intersect(origin, direction);
+        if (near.object == nullptr) {
+            return (originInFront) ? rear->intersect(origin, direction) : front->intersect(origin, direction);
+        } else {
+            return near;
+        }
+
     }
 
 }
