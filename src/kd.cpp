@@ -83,19 +83,6 @@ Node::Node(vector<Primitive*>* list, BoundingBox bound) {
     // get largest axis
     glm::vec3 size = centers.max - centers.min;
     int axis = (size.x > size.y) && (size.x > size.z) ? 0 : (size.y > size.z) ? 1 : 2;
-    glm::vec3 normal;
-
-    switch (axis) {
-        case 0:
-            normal = glm::vec3(1, 0, 0);
-            break;
-        case 1:
-            normal = glm::vec3(0, 1, 0);
-            break;
-        case 2:
-            normal = glm::vec3(0, 0, 1);
-            break;
-    }
 
     // recursion base case
     if (list->size() < 3 || size[axis] < EPSILON) {
@@ -108,7 +95,7 @@ Node::Node(vector<Primitive*>* list, BoundingBox bound) {
     vector<Primitive*>* front = new vector<Primitive*>();
     vector<Primitive*>* rear = new vector<Primitive*>();
     float position = centers.min[axis] + size[axis] / 2.0f;
-    this->plane = new Plane(normal, position);
+    this->plane = new Plane(axis, position);
 
     // divide bounding box along plane
     glm::vec3 midmin = bound.min;
@@ -195,15 +182,11 @@ Hit Node::intersect(glm::vec3 origin, glm::vec3 direction, float a, float b) {
 
     }
 
-    // get axis index
-    // TODO: save?
-    int axis = (plane->normal.x > plane->normal.y) && (plane->normal.x > plane->normal.z) ? 0 : (plane->normal.y > plane->normal.z) ? 1 : 2;
-    
     // which direction are we crossing the plane?
-    bool originInFront = origin[axis] > plane->d;
-    float s = (plane->d - origin[axis]) / direction[axis]; 
+    bool originInFront = origin[plane->axis] > plane->d;
+    float s = (plane->d - origin[plane->axis]) / direction[plane->axis]; 
     
-    if (s < 0 || s > b || glm::abs(direction[axis]) < EPSILON) {
+    if (s < 0 || s > b || glm::abs(direction[plane->axis]) < EPSILON) {
         // traverse near node
         return (originInFront) ? front->intersect(origin, direction, a, b) : rear->intersect(origin, direction, a, b);
     } else if (s < a) {

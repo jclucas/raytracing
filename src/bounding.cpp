@@ -53,8 +53,10 @@ bool BoundingBox::intersect(BoundingBox& other) {
 
 // AXIS ALIGNED PLANE
 
-Plane::Plane(glm::vec3 normal, float d) {
-    this->normal = normal;
+Plane::Plane(int axis, float d) {
+    this->axis = axis;
+    this->normal = glm::vec3(0);
+    this->normal[axis] = 1;
     this->d = d;
 }
 

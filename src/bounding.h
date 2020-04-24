@@ -22,9 +22,10 @@ class BoundingBox {
 class Plane {
 
     public:
+        int axis;
         glm::vec3 normal;
         float d;
-        Plane(glm::vec3 normal, float d);
+        Plane(int axis, float d);
         float intersect(glm::vec3 origin, glm::vec3 direction);
 
 };
