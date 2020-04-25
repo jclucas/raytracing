@@ -7,6 +7,7 @@
 #include "kd.h"
 #include "object.h"
 #include "light.h"
+#include "photon.h"
 
 /**
  * Construct an empty scene.
@@ -38,6 +39,8 @@ void Scene::transform(glm::mat4 m) {
 
     for (vector<Light*>::iterator i = lights.begin(); i != lights.end(); i++) {
         (*i)->transform(m);
+        glm::vec3 pos = (*i)->getPosition();
+        std::cout <<  pos.x << " " << pos.y << " " << pos.z << std::endl;
     }
 
 }
@@ -73,6 +76,65 @@ void Scene::generateTree(vector<Primitive*>* prims) {
     tree = new KDTree(prims);
     double duration = std::difftime(std::clock(), start) / (double) CLOCKS_PER_SEC;
     cout << "k-d tree generated after " << duration << " seconds." << endl;
+
+}
+
+void Scene::generatePhotonMap(int numPhotons) {
+
+    // start clock
+    std::clock_t start = std::clock();
+
+    // get total scene intensity
+    float total = 0;
+
+    for (auto it = lights.begin(); it != lights.end(); it++) {
+        total += (*it)->getIntensity();
+    }
+
+    // distribute photons by relative intensity
+    int toGenerate[lights.size()] = {};
+    int remaining = numPhotons;
+
+    for (size_t i = 0; i < lights.size() - 1; i++) {
+        toGenerate[i] = numPhotons * (lights[i]->getIntensity() / total);
+        remaining -= toGenerate[i];
+    }
+
+    toGenerate[lights.size() - 1] = remaining;
+
+    // generate photon list
+    Photon* list = new Photon[numPhotons];
+    int count = 0;
+
+    for (size_t i = 0; i < lights.size(); i++) {
+        lights[i]->spawnPhotons(toGenerate[i], &list[count]);
+        count += toGenerate[i];
+    }
+
+    // TODO: not this
+    vector<Photon*>* photons = new vector<Photon*>();
+    BoundingBox bound = BoundingBox();
+
+    // trace
+    for (size_t i = 0; i < numPhotons; i++) {
+        list[i].pos = castMonteCarlo(list[i].pos, list[i].direction, 0);
+        if (list[i].pos != glm::vec3(INFINITY, INFINITY, INFINITY)) {
+            photons->push_back(&list[i]);
+            bound.expand(list[i].pos);
+        }
+    }
+
+    // generate map
+    map = new PhotonMap(photons, bound);
+
+    // insert photons
+    for (auto it = photons->begin(); it != photons->end(); it++) {
+        map->insert((*it));
+    }
+
+    // report time
+    double duration = std::difftime(std::clock(), start) / (double) CLOCKS_PER_SEC;
+    cout << "photon map generated after " << duration << " seconds." << endl;
 
 }
 
@@ -116,6 +178,21 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
         return background;
     } else {
         return hit.object->getColor(hit.point, origin, direction, *this, depth);
+    }
+
+}
+
+/**
+ * @return position of photon following ray
+ */
+glm::vec3 Scene::castMonteCarlo(glm::vec3 origin, glm::vec3 direction, int depth) {
+    
+    Hit hit = cast(origin, direction);
+    
+    if (hit.object == nullptr) {
+        return glm::vec3(INFINITY, INFINITY, INFINITY);
+    } else {
+        return hit.object->bounce(hit.point, direction, *this, depth);
     }
 
 }

@@ -22,7 +22,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up) {
 
     // hardcoded parameters for now
     this->fov = glm::radians(30.0f);
-    this->length = 1;
+    this->length = 0.035f;
 
 }
 
@@ -38,20 +38,24 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
 
     // transform scene to camera space    
     scene.transform(m);
-    position = m * glm::vec4(position, 0);
+    position = m * glm::vec4(position, 1);
 
     // create k-d tree
     scene.generateTree(prims);
+
+    // generate photon map
+    // scene.generatePhotonMap(NUM_PHOTONS);
 
     // create framebuffer
     glm::vec3 *frame = new glm::vec3[height * width];
 
     // define film plane
     glm::vec3 center = glm::vec3(0, 0, length);
-    float w = glm::tan(fov) * length;
+    // float w = glm::tan(fov) * length;
+    float h = 0.025f;
 
     // amount to step in camera space between pixels
-    float step = -w / width;
+    float step = -h / height;
     glm::vec4 dw = glm::vec4(step, 0, 0, 0);
     glm::vec4 dh = glm::vec4(0, step, 0, 0);
     

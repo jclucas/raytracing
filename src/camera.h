@@ -3,6 +3,8 @@
 
 class Scene;
 
+#define NUM_PHOTONS 100000
+
 class Camera {
 
     private:

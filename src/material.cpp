@@ -5,10 +5,17 @@
 #include "texture.h"
 
 /**
- * Return coefficient of reflectance.
+ * Return coefficient of diffuse reflectance.
  */
-float Material::getReflectance() {
-    return reflectance;
+float Material::getDiffuse() {
+    return diffuse;
+}
+
+/**
+ * Return coefficient of specular reflectance.
+ */
+float Material::getSpecular() {
+    return specular;
 }
 
 /**
@@ -26,10 +33,17 @@ float Material::getIOR() {
 }
 
 /** 
- * Set coefficient of reflectance.
+ * Set coefficient of diffuse reflectance.
  */
-void Material::setReflectance(float k) {
-    this->reflectance = k;
+void Material::setDiffuse(float k) {
+    this->diffuse = k;
+}
+
+/** 
+ * Set coefficient of specular reflectance.
+ */
+void Material::setSpecular(float k) {
+    this->specular = k;
 }
 
 /** 
@@ -107,4 +121,5 @@ glm::vec3 Phong::getColor(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, gl
     }
 
     return light.getRadiance() * (diffuse * glm::max(glm::dot(s, n), 0.0f) + specular * powf(glm::max(glm::dot(r, v), 0.0f), sharpness));
+
 }

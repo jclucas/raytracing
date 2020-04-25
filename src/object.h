@@ -14,6 +14,9 @@ class Primitive;
 // for floating point equality cutoffs
 #define EPSILON 0.00001f
 
+// fraction of normal to move away from surfaces
+#define D_N 0.1f
+
 // for recursive rays
 #define MAX_DEPTH 5
 
@@ -48,6 +51,7 @@ class Primitive : public Object {
         virtual bool intersect(BoundingBox& bounds) = 0;
         virtual glm::vec3 getNormal(glm::vec3 point) = 0;
         glm::vec3 getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene, int depth);
+        glm::vec3 bounce(glm::vec3 point, glm::vec3 direction, Scene& scene, int depth);
         virtual vector<Primitive*>* getPrimitives() override;
 
 };

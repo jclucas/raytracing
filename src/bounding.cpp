@@ -44,6 +44,12 @@ void BoundingBox::expand(BoundingBox& other) {
     max = glm::max(max, other.max);
 }
 
+bool BoundingBox::intersect(glm::vec3 other) {
+    return (min.x <= other.x && max.x >= other.x) &&
+           (min.y <= other.y && max.y >= other.y) &&
+           (min.z <= other.z && max.z >= other.z);
+}
+
 bool BoundingBox::intersect(BoundingBox& other) {
     return (min.x <= other.max.x && max.x >= other.min.x) &&
            (min.y <= other.max.y && max.y >= other.min.y) &&
