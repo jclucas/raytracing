@@ -44,7 +44,7 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
     scene.generateTree(prims);
 
     // generate photon map
-    // scene.generatePhotonMap(NUM_PHOTONS);
+    scene.generatePhotonMap(NUM_PHOTONS);
 
     // create framebuffer
     glm::vec3 *frame = new glm::vec3[height * width];

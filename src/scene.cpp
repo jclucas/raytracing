@@ -40,7 +40,6 @@ void Scene::transform(glm::mat4 m) {
     for (vector<Light*>::iterator i = lights.begin(); i != lights.end(); i++) {
         (*i)->transform(m);
         glm::vec3 pos = (*i)->getPosition();
-        std::cout <<  pos.x << " " << pos.y << " " << pos.z << std::endl;
     }
 
 }
@@ -172,13 +171,29 @@ Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
  */
 glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
     
+    glm::vec3 color;
     Hit hit = cast(origin, direction);
     
+    // direct & specular
     if (hit.object == nullptr) {
         return background;
     } else {
-        return hit.object->getColor(hit.point, origin, direction, *this, depth);
+        color = hit.object->getColor(hit.point, origin, direction, *this, depth);
     }
+
+    // sample photon map for global illumination
+    minheap* heap = new minheap(MinSquaredDist(hit.point), vector<Photon*>());
+    map->locatePhotons(hit.point, 10.0f, heap);
+
+    if (heap->size() > 0) {
+        Photon* nearest = heap->top();
+        // visualize photons
+        if (glm::distance(nearest->pos, hit.point) < 1.0f) {
+            return glm::vec3(1);
+        }
+    }
+
+    return color;
 
 }
 
