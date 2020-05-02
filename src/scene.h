@@ -12,6 +12,8 @@ class PhotonMap;
 
 using namespace std;
 
+#define PI 3.141592f
+
 typedef struct Hit {
     Primitive *object;
     glm::vec3 point;

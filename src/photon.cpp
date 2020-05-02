@@ -112,7 +112,7 @@ void PhotonMap::locatePhotons(glm::vec3 point, float radius, minheap* heap) {
         for (auto it = contents->begin(); it != contents->end(); it++) {
 
             photon = (*it)->pos;
-            dist = photon.x - point.x + photon.y - point.y + photon.z - point.z;
+            dist = glm::abs(photon.x - point.x) + glm::abs(photon.y - point.y) + glm::abs(photon.z - point.z);
 
             if (dist < radius) {
                 heap->push(*it);

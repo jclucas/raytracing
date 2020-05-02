@@ -56,12 +56,12 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
         // TODO: encapsulation
         if (shadow.object != nullptr && shadow.object->material->getProbTransmit() > 0.0f) {
             glm::vec3 r = glm::reflect(-s, n);
-            color += shadow.object->material->getProbTransmit() * material->getDiffuse(objPoint, n, s, r, v, **i);
-            color += shadow.object->material->getProbTransmit() * material->getSpecular(objPoint, n, s, r, v, **i);
+            color += shadow.object->material->getProbTransmit() * material->getDiffuse(objPoint, n, s, (*i)->getRadiance());
+            color += shadow.object->material->getProbTransmit() * material->getSpecular(objPoint, n, s, r, v, (*i)->getRadiance());
         } else if (shadow.object == nullptr || dist < glm::length(shadow.point - point)) { 
             glm::vec3 r = glm::reflect(-s, n);
-            color += material->getDiffuse(objPoint, n, s, r, v, **i);
-            color += material->getSpecular(objPoint, n, s, r, v, **i);
+            color += material->getDiffuse(objPoint, n, s, (*i)->getRadiance());
+            color += material->getSpecular(objPoint, n, s, r, v, (*i)->getRadiance());
         }
 
         // recursive call
@@ -134,9 +134,9 @@ glm::vec3 Primitive::bounce(glm::vec3 point, glm::vec3 direction, Scene& scene, 
 
 }
 
-// glm::vec3 Primitive::getDiffuse(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene) {
-
-// }
+glm::vec3 Primitive::getDiffuse(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, glm::vec3 radiance) {
+    return material->getDiffuse(point, this->getNormal(point), glm::normalize(-direction), radiance);
+}
 
 vector<Primitive*>* Primitive::getPrimitives() {
     // TODO: memory management

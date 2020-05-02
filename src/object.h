@@ -52,6 +52,7 @@ class Primitive : public Object {
         virtual glm::vec3 getNormal(glm::vec3 point) = 0;
         glm::vec3 getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene, int depth);
         glm::vec3 bounce(glm::vec3 point, glm::vec3 direction, Scene& scene, int depth);
+        glm::vec3 getDiffuse(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, glm::vec3 radiance);
         virtual vector<Primitive*>* getPrimitives() override;
 
 };
