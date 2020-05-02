@@ -20,7 +20,8 @@ class Material {
         float getProbTransmit();
         float getIOR();
         void setIOR(float k);
-        virtual glm::vec3 getColor(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) = 0;
+        virtual glm::vec3 getDiffuse(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) = 0;
+        virtual glm::vec3 getSpecular(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) = 0;
         void add(Texture* texture);
 
 };
@@ -32,6 +33,7 @@ class Phong : public Material {
 
     public:
         Phong(glm::vec3 diffuse, glm::vec3 specular, float sharpness, glm::vec3 transmit = glm::vec3(0), float ior = 1);
-        virtual glm::vec3 getColor(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) override;
+        virtual glm::vec3 getDiffuse(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) override;
+        virtual glm::vec3 getSpecular(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) override;
 
 };

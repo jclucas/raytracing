@@ -88,9 +88,7 @@ Phong::Phong(glm::vec3 diffuse, glm::vec3 specular, float sharpness, glm::vec3 t
  * @param v direction to viewer
  * @return intensity at point
  */
-glm::vec3 Phong::getColor(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) {
-
-    glm::vec3 diffuse = this->diffuse;
+glm::vec3 Phong::getDiffuse(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) {
 
     if (textures != nullptr) {
 
@@ -113,6 +111,19 @@ glm::vec3 Phong::getColor(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, gl
 
     }
 
-    return light.getRadiance() * (diffuse * glm::max(glm::dot(s, n), 0.0f) + specular * powf(glm::max(glm::dot(r, v), 0.0f), sharpness));
+    return light.getRadiance() * (diffuse * glm::max(glm::dot(s, n), 0.0f));
 
+}
+
+/**
+ * Get specular Phong shading for a point with given geometry.
+ * @param p point on surface
+ * @param n normal vector
+ * @param s direction to source
+ * @param r perfectly reflective direction
+ * @param v direction to viewer
+ * @return intensity at point
+ */
+glm::vec3 Phong::getSpecular(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) {
+    return light.getRadiance() * specular * powf(glm::max(glm::dot(r, v), 0.0f), sharpness);
 }
