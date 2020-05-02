@@ -112,8 +112,8 @@ void PhotonMap::locatePhotons(glm::vec3 point, float radius, minheap* heap) {
         for (auto it = contents->begin(); it != contents->end(); it++) {
 
             photon = (*it)->pos;
-            dist = glm::abs(photon.x - point.x) + glm::abs(photon.y - point.y) + glm::abs(photon.z - point.z);
-
+            dist = glm::dot(photon - point, photon - point);
+            
             if (dist < radius) {
                 heap->push(*it);
             }
@@ -152,5 +152,7 @@ MinSquaredDist::MinSquaredDist(glm::vec3 target) {
 }
 
 bool MinSquaredDist::operator() (const Photon* lhs, const Photon* rhs) {
-    return (lhs->pos.x - target.x + lhs->pos.y - target.y + lhs->pos.z - target.z) < (rhs->pos.x - target.x + rhs->pos.y - target.y + rhs->pos.z - target.z);
+    glm::vec3 ldiff = lhs->pos - target;
+    glm::vec3 rdiff = rhs->pos - target;
+    return (glm::dot(ldiff, ldiff) < glm::dot(rdiff, rdiff));
 }
