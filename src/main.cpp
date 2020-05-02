@@ -28,17 +28,10 @@ int main() {
 
     // create materials
     Phong *white = new Phong(glm::vec3(1.0f), glm::vec3(0), 1);
-    white->setDiffuse(1.0f);
     Phong *green = new Phong(glm::vec3(0, 1.0f, 0), glm::vec3(0), 1);
-    green->setDiffuse(1.0f);
     Phong *red = new Phong(glm::vec3(1.0f, 0, 0), glm::vec3(0), 1);
-    red->setDiffuse(1.0f);
     Phong *reflective = new Phong(glm::vec3(0.8f), glm::vec3(1), 10.0f);
-    reflective->setDiffuse(0.5);
-    reflective->setSpecular(0.5);
-    Phong *transparent = new Phong(glm::vec3(0.95f), glm::vec3(0.3f), 2.0f);
-    transparent->setTransmittance(0.8);
-    transparent->setIOR(0.95);
+    Phong *transparent = new Phong(glm::vec3(0.95f), glm::vec3(0.1f), 2.0f, glm::vec3(0.8), 0.95f);
 
     // add lights
     Scene scene = Scene(BACKGROUND);

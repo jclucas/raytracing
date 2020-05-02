@@ -9,19 +9,16 @@ class Texture;
 class Material {
 
     protected:
-        float diffuse = 0;
-        float specular = 0;
-        float transmittance = 0;
+        glm::vec3 diffuse, specular, transmittance;
+        float probDiffuse, probSpecular, probTransmit;
         float ior = 1;
         std::vector<Texture*>* textures;
+        void normalizeProbabilities();
     public:
-        float getDiffuse();
-        float getSpecular();
-        float getTransmittance();
+        float getProbDiffuse();
+        float getProbSpecular();
+        float getProbTransmit();
         float getIOR();
-        void setDiffuse(float k);
-        void setSpecular(float k);
-        void setTransmittance(float k);
         void setIOR(float k);
         virtual glm::vec3 getColor(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) = 0;
         void add(Texture* texture);
@@ -31,13 +28,10 @@ class Material {
 class Phong : public Material {
 
     private:
-        glm::vec3 diffuse;
-        glm::vec3 specular;
         float sharpness;
 
     public:
-        Phong(glm::vec3 diffuse, glm::vec3 specular, float sharpness);
-        // Phong(Texture* diffuse, glm::vec3 specular, float sharpness);
+        Phong(glm::vec3 diffuse, glm::vec3 specular, float sharpness, glm::vec3 transmit = glm::vec3(0), float ior = 1);
         virtual glm::vec3 getColor(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, Light &light) override;
 
 };

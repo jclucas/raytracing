@@ -7,22 +7,22 @@
 /**
  * Return coefficient of diffuse reflectance.
  */
-float Material::getDiffuse() {
-    return diffuse;
+float Material::getProbDiffuse() {
+    return probDiffuse;
 }
 
 /**
  * Return coefficient of specular reflectance.
  */
-float Material::getSpecular() {
-    return specular;
+float Material::getProbSpecular() {
+    return probSpecular;
 }
 
 /**
  * Return coefficient of transmittance.
  */
-float Material::getTransmittance() {
-    return transmittance;
+float Material::getProbTransmit() {
+    return probTransmit;
 }
 
 /**
@@ -30,27 +30,6 @@ float Material::getTransmittance() {
  */
 float Material::getIOR() {
     return ior;
-}
-
-/** 
- * Set coefficient of diffuse reflectance.
- */
-void Material::setDiffuse(float k) {
-    this->diffuse = k;
-}
-
-/** 
- * Set coefficient of specular reflectance.
- */
-void Material::setSpecular(float k) {
-    this->specular = k;
-}
-
-/** 
- * Set coefficient of transmittance.
- */
-void Material::setTransmittance(float k) {
-    this->transmittance = k;
 }
 
 /** 
@@ -73,18 +52,32 @@ void Material::add(Texture* texture) {
 
 }
 
+void Material::normalizeProbabilities() {
+    this->probDiffuse = glm::length(diffuse);
+    this->probSpecular = glm::length(specular);
+    this->probTransmit = glm::length(transmittance);
+    float total = probDiffuse + probSpecular + probTransmit;
+    this->probDiffuse /= total;
+    this->probSpecular /= total;
+    this->probTransmit /= total;
+}
+
 /**
  * Create a Phong material.
  * @param diffuse reflectance of diffuse illumination
  * @param specular reflectance of specular illumination
  * @param sharpness specular exponent
  */
-Phong::Phong(glm::vec3 diffuse, glm::vec3 specular, float sharpness) {
+Phong::Phong(glm::vec3 diffuse, glm::vec3 specular, float sharpness, glm::vec3 transmit, float ior) {
     this->diffuse = diffuse;
     this->specular = specular;
+    this->transmittance = transmit;
+    this->ior = ior;
     this->sharpness = sharpness;
     this->textures = nullptr;
+    normalizeProbabilities();
 }
+
 
 /**
  * Get Phong shading for a point with given geometry.
