@@ -50,11 +50,11 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
         glm::vec3 s = glm::normalize((*i)->getPosition() - point);
 
         // cast shadow vector
-        Hit shadow = scene.cast(point + EPSILON * n, s);
+        Hit shadow = scene.cast(point + D_N * n, s);
         float dist = glm::length((*i)->getPosition() - point);
 
         // TODO: encapsulation
-        if (shadow.object != nullptr && shadow.object->material->getTransmittance() < 1.0f) {
+        if (shadow.object != nullptr && shadow.object->material->getTransmittance() > 0.0f) {
             glm::vec3 r = glm::reflect(-s, n);
             color += shadow.object->material->getTransmittance() * material->getColor(objPoint, n, s, r, v, **i);
         } else if (shadow.object == nullptr || dist < glm::length (shadow.point - point)) { 
@@ -68,7 +68,7 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
             // reflection
             if (material->getReflectance() > 0) {
                 glm::vec3 reflect = glm::reflect(-v, n);
-                color += material->getReflectance() * scene.getPixel(point + EPSILON * n, reflect, depth + 1);
+                color += material->getReflectance() * scene.getPixel(point + D_N * n, reflect, depth + 1);
             }
 
             // transmission
@@ -95,7 +95,7 @@ glm::vec3 Primitive::getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direc
                     refract = ratio * (-v) - (ratio * dot + std::sqrt(sqrt)) * norm;
                 }
 
-                color += material->getTransmittance() * scene.getPixel(point + EPSILON * -norm, refract, depth + 1);
+                color += material->getTransmittance() * scene.getPixel(point + D_N * -norm, refract, depth + 1);
 
             }
 

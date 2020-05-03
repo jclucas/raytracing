@@ -19,7 +19,7 @@ using namespace std;
 int main() {
 
     // output properties
-    const int HEIGHT = 720;
+    const int HEIGHT = 800;
     const int WIDTH = 1280;
     const std::string FILENAME = "render.ppm";
 
@@ -39,33 +39,33 @@ int main() {
     floor->add(check);
 
     // set up scene
-    // Scene scene = Scene(BACKGROUND);
-    // Mesh *plane = new Mesh(glm::vec3(-10, 2, 0), glm::vec3(0), glm::vec3(15, 5, 1), floor);
-    // plane->add(glm::vec3(-1, 1, 0), glm::vec3(-1, -1, 0), glm::vec3(1, -1, 0));
-    // plane->add(glm::vec3(1, -1, 0), glm::vec3(1, 1, 0), glm::vec3(-1, 1, 0));
-    // // Mesh *cube = new Mesh(glm::vec3(0, 0, 1), glm::vec3(0, 0, glm::radians(30.0f)), glm::vec3(1), transparent);
-    // // cube->read("resources/cube.ply");
-    // Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, transparent);
-    // Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, reflective);
-    // Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
-    // scene.add(*sphere1);
-    // scene.add(*sphere2);
-    // scene.add(*plane);
-    // // scene.add(*cube);
-    // scene.add(*light);
-
-    // ALT SCENE (kd tree test)
-    Scene scene = Scene(glm::vec3(1, 1, .75f));
+    Scene scene = Scene(BACKGROUND);
+    Mesh *plane = new Mesh(glm::vec3(-10, 2, 0), glm::vec3(0), glm::vec3(15, 5, 1), floor);
+    plane->add(glm::vec3(-1, 1, 0), glm::vec3(-1, -1, 0), glm::vec3(1, -1, 0));
+    plane->add(glm::vec3(1, -1, 0), glm::vec3(1, 1, 0), glm::vec3(-1, 1, 0));
+    // Mesh *cube = new Mesh(glm::vec3(0, 0, 1), glm::vec3(0, 0, glm::radians(30.0f)), glm::vec3(1), transparent);
+    // cube->read("resources/cube.ply");
+    Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, transparent);
+    Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, reflective);
     Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
-    Phong *phong = new Phong(glm::vec3(.5f, .5f, 1), glm::vec3(1), 10.0f);
-    Mesh *bunny = new Mesh(glm::vec3(0, 0.5f, -3), glm::vec3(glm::radians(90.0f), glm::radians(90.0f), 0), glm::vec3(30), phong);
-    bunny->read("resources/bun_zipper_res4.ply");
-    // bunny->read("resources/box.ply");
-    scene.add(*bunny);
+    scene.add(*sphere1);
+    scene.add(*sphere2);
+    scene.add(*plane);
+    // scene.add(*cube);
     scene.add(*light);
 
+    // ALT SCENE (kd tree test)
+    // Scene scene = Scene(glm::vec3(1, 1, .75f));
+    // Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
+    // Phong *phong = new Phong(glm::vec3(.5f, .5f, 1), glm::vec3(1), 10.0f);
+    // Mesh *bunny = new Mesh(glm::vec3(0, 0.5f, -3), glm::vec3(glm::radians(90.0f), glm::radians(90.0f), 0), glm::vec3(30), phong);
+    // bunny->read("resources/bun_zipper_res4.ply");
+    // // bunny->read("resources/box.ply");
+    // scene.add(*bunny);
+    // scene.add(*light);
+
     // set up camera
-    Camera camera = Camera(glm::vec3(10, 0, 2.5), glm::vec3(-1, 0, -glm::tan(glm::radians(5.0f))), glm::vec3(0, 0, 1));
+    Camera camera = Camera(glm::vec3(10, 0, 2.5), glm::vec3(-1, 0, -glm::tan(glm::radians(5.0f))), glm::vec3(0, 0, 1), new WardModel);
 
     // start clock
     std::clock_t start = std::clock();

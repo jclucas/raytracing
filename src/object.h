@@ -14,6 +14,9 @@ class Primitive;
 // for floating point equality cutoffs
 #define EPSILON 0.00001f
 
+// fraction of normal to move away from surfaces
+#define D_N 0.1f
+
 // for recursive rays
 #define MAX_DEPTH 5
 
