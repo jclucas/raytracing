@@ -1,25 +1,21 @@
 #include <glm/geometric.hpp>
 #include "tone.h"
 
-
+/**
+ * Get photometric luminance from an RGB value.
+ * @param tri RGB triple
+ * @return photometric value
+ */
 float ToneOperator::getLuminance(glm::vec3 tri) {
     return glm::dot(tri, glm::vec3(0.27f, 0.67f, 0.06f));
 }
 
-float ToneOperator::getMaxValue(glm::vec3* frame, size_t size) {
-
-    // find maximum intensity component
-    float maxval = 0;
-    for (size_t i = 0; i < size; i++) {
-        if (frame[i].r > maxval) { maxval = frame[i].r; }
-        if (frame[i].g > maxval) { maxval = frame[i].g; }
-        if (frame[i].b > maxval) { maxval = frame[i].b; }
-    }
-
-    return maxval;
-
-}
-
+/**
+ * Get the maximum photometric luminance in an image.
+ * @param frame a frame buffer
+ * @param size array size of buffer
+ * @return photometric value
+ */
 float ToneOperator::getMaxLuminance(glm::vec3* frame, size_t size) {
 
     // find maximum intensity component
@@ -35,6 +31,12 @@ float ToneOperator::getMaxLuminance(glm::vec3* frame, size_t size) {
 
 }
 
+/**
+ * Get the log average luminance in a scene.
+ * @param frame a frame buffer
+ * @param size array size of buffer
+ * @return log average
+ */
 float ToneOperator::getLogAverage(glm::vec3* frame, size_t size) {
 
     // find maximum intensity component
@@ -48,28 +50,37 @@ float ToneOperator::getLogAverage(glm::vec3* frame, size_t size) {
 
 }
 
-LinearModel::LinearModel() {
-    this->min = 0;
-    this->max = 0;
-}
-
+/**
+ * Apply a simple linear scaling from 0 to the scene's max value.
+ * @param frame an image
+ * @param h height
+ * @param w width
+ * @return a tone mapped image
+ */
 glm::vec3* LinearModel::apply(glm::vec3* frame, size_t h, size_t w) {
 
     // get max luminance component
-    max = getMaxLuminance(frame, h * w);
+    float max = getMaxLuminance(frame, h * w);
 
     // create output buffer
     glm::vec3* output = new glm::vec3[h * w];
 
     // store scaled value
     for (int i = 0; i < h * w; i++) {
-        output[i] = glm::clamp(frame[i] / max, 0.0f, 1.0f);
+        output[i] = frame[i] / max * MAX_DISP_LUM;
     }
 
     return output;
 
 }
 
+/**
+ * Apply Ward's perceptual tone reproduction operator.
+ * @param frame an image
+ * @param h height
+ * @param w width
+ * @return a tone mapped image
+ */
 glm::vec3* WardModel::apply(glm::vec3* frame, size_t h, size_t w) {
 
     // get max luminance
@@ -92,6 +103,13 @@ glm::vec3* WardModel::apply(glm::vec3* frame, size_t h, size_t w) {
 
 }
 
+/**
+ * Apply Reinhard's photographic tone reproduction operator.
+ * @param frame an image
+ * @param h height
+ * @param w width
+ * @return a tone mapped image
+ */
 glm::vec3* ReinhardModel::apply(glm::vec3* frame, size_t h, size_t w) {
 
     // get max luminance
