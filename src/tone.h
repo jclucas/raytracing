@@ -9,7 +9,6 @@ class ToneOperator {
 
     protected:
         float getLuminance(glm::vec3 tri);
-        float getMaxValue(glm::vec3* frame, size_t size);
         float getMaxLuminance(glm::vec3* frame, size_t size);
         float getLogAverage(glm::vec3* frame, size_t size);
 
@@ -18,17 +17,19 @@ class ToneOperator {
 
 };
 
+/**
+ * Linear scaling from 0 to max scene value.
+ */
 class LinearModel : public ToneOperator {
 
-    private:
-        float min, max;
-
     public:
-        LinearModel();
         virtual glm::vec3* apply(glm::vec3* frame, size_t h, size_t w) override;
 
 };
 
+/**
+ * Ward's perceptual operator.
+ */
 class WardModel : public ToneOperator {
 
     public:
@@ -36,6 +37,9 @@ class WardModel : public ToneOperator {
 
 };
 
+/**
+ * Reinhard's photographic operator.
+ */
 class ReinhardModel : public ToneOperator {
 
     private:
