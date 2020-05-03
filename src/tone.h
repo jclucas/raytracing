@@ -3,7 +3,7 @@
 #include <glm/vec3.hpp>
 
 // maximum display luminance
-#define MAX_LUM 100.0f
+#define MAX_DISP_LUM 100.0f
 
 class ToneOperator {
 
@@ -37,6 +37,9 @@ class WardModel : public ToneOperator {
 };
 
 class ReinhardModel : public ToneOperator {
+
+    private:
+        float gray = 0.18;
 
     public:
         virtual glm::vec3* apply(glm::vec3* frame, size_t h, size_t w) override;

@@ -47,7 +47,7 @@ int main() {
     // cube->read("resources/cube.ply");
     Sphere *sphere1 = new Sphere(glm::vec3(0, 0, 2.5), 1.25f, transparent);
     Sphere *sphere2 = new Sphere(glm::vec3(-2, 1.5, 1.5), 1.0f, reflective);
-    Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), 1);
+    Light *light = new Light(glm::vec3(5, -1, 10), glm::vec3(1), .1);
     scene.add(*sphere1);
     scene.add(*sphere2);
     scene.add(*plane);
@@ -65,7 +65,7 @@ int main() {
     // scene.add(*light);
 
     // set up camera
-    Camera camera = Camera(glm::vec3(10, 0, 2.5), glm::vec3(-1, 0, -glm::tan(glm::radians(5.0f))), glm::vec3(0, 0, 1), new WardModel);
+    Camera camera = Camera(glm::vec3(10, 0, 2.5), glm::vec3(-1, 0, -glm::tan(glm::radians(5.0f))), glm::vec3(0, 0, 1));
 
     // start clock
     std::clock_t start = std::clock();
@@ -85,7 +85,7 @@ int main() {
     // write discrete pixel value
     glm::ivec3 pixel;
     for (int i = 0; i < HEIGHT * WIDTH; i++) {
-        pixel = glm::floor(255.0f * frame[i]);
+        pixel = glm::floor(255.0f * glm::clamp(frame[i] / MAX_DISP_LUM, 0.0f, 1.0f));
         file << pixel.x << " " << pixel.y << " " << pixel.z << "\n";
     }
 

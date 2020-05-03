@@ -73,11 +73,10 @@ glm::vec3* LinearModel::apply(glm::vec3* frame, size_t h, size_t w) {
 glm::vec3* WardModel::apply(glm::vec3* frame, size_t h, size_t w) {
 
     // get max luminance
-    float max = getMaxLuminance(frame, h * w);
     float logavg = getLogAverage(frame, h * w);
 
     // ward scale factor
-    float sf = pow((1.219f + pow(MAX_LUM / 2.0f, 0.4f) / 1.219f + pow(logavg, 0.4f)), 2.5f) / MAX_LUM;
+    float sf = pow((1.219f + pow(MAX_DISP_LUM / 2.0f, 0.4f) / 1.219f + pow(logavg, 0.4f)), 2.5f);
 
     // create output buffer
     glm::vec3* output = new glm::vec3[h * w];
@@ -85,7 +84,29 @@ glm::vec3* WardModel::apply(glm::vec3* frame, size_t h, size_t w) {
     // store scaled value
     for (int i = 0; i < h * w; i++) {
         for (int axis = 0; axis < 3; axis++) {
-            output[i][axis] = frame[i][axis] / max * sf;
+            output[i][axis] = frame[i][axis] * sf;
+        }
+    }
+
+    return output;
+
+}
+
+glm::vec3* ReinhardModel::apply(glm::vec3* frame, size_t h, size_t w) {
+
+    // get max luminance
+    float logavg = getLogAverage(frame, h * w);
+
+    // reinhard scale factor
+    float sf = gray / logavg;
+
+    // create output buffer
+    glm::vec3* output = new glm::vec3[h * w];
+
+    // store scaled value
+    for (int i = 0; i < h * w; i++) {
+        for (int axis = 0; axis < 3; axis++) {
+            output[i][axis] = (frame[i][axis] * sf) / (1.0f + (frame[i][axis] * sf)) * MAX_DISP_LUM;
         }
     }
 
