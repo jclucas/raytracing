@@ -6,9 +6,10 @@
 #include "scene.h"
 #include "camera.h"
 
-Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up) {
+Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, ToneOperator* tone) {
 
     this->position = position;
+    this->tone = tone;
     
     glm::vec3 n = glm::normalize(lookat - position);
     glm::vec3 u = glm::normalize(glm::cross(up, n));
@@ -47,7 +48,7 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
     scene.generatePhotonMap(NUM_PHOTONS);
 
     // create framebuffer
-    glm::vec3 *frame = new glm::vec3[height * width];
+    glm::vec3* hdr = new glm::vec3[height * width];
 
     // define film plane
     glm::vec3 center = glm::vec3(0, 0, length);
@@ -70,10 +71,17 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
     for (size_t i = 0; i < height; i++) {
         for (size_t j = 0; j < width; j++) {
             dir = glm::normalize(glm::vec3(ul + dw * float(j) + dh * float(i)));
-            frame[i*width + j] = scene.getPixel(position, dir, 1);
+            hdr[i*width + j] = scene.getPixel(position, dir, 1);
         }
     }
 
-    return frame;
+    // tone reproduction
+    if (tone == nullptr) {
+        tone = new LinearModel();
+    }
+
+    glm::vec3* out = tone->apply(hdr, height, width);
+    delete[] hdr;
+    return out;
 
 }

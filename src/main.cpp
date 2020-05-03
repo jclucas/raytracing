@@ -85,18 +85,10 @@ int main() {
     file.open(FILENAME);
     file << "P3 " << WIDTH << " " << HEIGHT << " 255" << endl;
 
-    // find maximum intensity component
-    float maxval = 1;
-    for (int i = 0; i < HEIGHT * WIDTH; i++) {
-        if (frame[i].r > maxval) { maxval = frame[i].r; }
-        if (frame[i].g > maxval) { maxval = frame[i].g; }
-        if (frame[i].b > maxval) { maxval = frame[i].b; }
-    }
-
-    // write scaled pixel value
+    // write discrete pixel value
     glm::ivec3 pixel;
     for (int i = 0; i < HEIGHT * WIDTH; i++) {
-        pixel = glm::floor(255.0f * glm::max(glm::vec3(0), frame[i]) / maxval);
+        pixel = glm::floor(255.0f * glm::clamp(frame[i] / MAX_DISP_LUM, 0.0f, 1.0f));
         file << pixel.x << " " << pixel.y << " " << pixel.z << "\n";
     }
 
