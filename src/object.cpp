@@ -122,7 +122,7 @@ glm::vec3 Primitive::getDirectIllumination(glm::vec3 point, glm::vec3 origin, gl
 inline glm::mat3 getCoordinateTransform(glm::vec3 n) {
 
     glm::mat3 m;
-    glm::vec3 u = glm::normalize(glm::cross(n, glm::vec3(1, 0, 0)));
+    glm::vec3 u = glm::normalize(glm::cross(glm::vec3(1, 0, 0), n));
     glm::vec3 v = glm::cross(n, u);
 
     // transform matrix
@@ -134,7 +134,7 @@ inline glm::mat3 getCoordinateTransform(glm::vec3 n) {
 
 }
 
-Photon* Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Scene& scene) {
+void Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Scene& scene) {
 
     float test = scene.dist(scene.random);
     glm::vec3 n = getNormal(point);
@@ -174,11 +174,11 @@ Photon* Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, 
 
     }
 
-    Photon* out = new Photon();
-    out->pos = ray.origin;
-    out->direction = ray.direction;
-    out->power = power / prob;
-    return out;
+    // Photon out = Photon();
+    photon.pos = ray.origin;
+    photon.direction = ray.direction;
+    photon.power = power / prob;
+    // return out;
 
 }
 

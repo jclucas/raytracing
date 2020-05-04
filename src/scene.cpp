@@ -116,23 +116,27 @@ void Scene::generatePhotonMap(int numPhotons) {
 
     // trace
     for (size_t i = 0; i < numPhotons; i++) {
+
+        Photon& p = list[i];
         
         for (size_t depth = 0; depth < MAX_DEPTH; depth++) {
         
-            Hit hit = cast(list[i].pos, list[i].direction);
+            Hit hit = cast(p.pos, p.direction);
 
             if (hit.object == nullptr) {
                 continue;
-            } else if (depth >= 1) {
+            } else {
                 
-                Photon* p = hit.object->bounce(list[i], hit.point, list[i].direction, *this);
+                hit.object->bounce(p, hit.point, p.direction, *this);
 
-                if (p->direction == glm::vec3(0)) {
+                if (p.direction == glm::vec3(0)) {
                     continue;
                 }
-                
-                photons->push_back(p);
-                bound.expand(p->pos);
+
+                if (depth >= 1) {
+                    photons->push_back(new Photon(p));
+                    bound.expand(p.pos);
+                }
 
             }
 
