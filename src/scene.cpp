@@ -124,7 +124,8 @@ void Scene::generatePhotonMap(int numPhotons) {
 
             if (hit.object == nullptr) {
                 continue;
-            } else {
+            } else if (depth >= 1) {
+                
                 Ray r = hit.object->bounce(hit.point, list[i].direction, *this);
 
                 if (r.direction == glm::vec3(0)) {
@@ -141,9 +142,10 @@ void Scene::generatePhotonMap(int numPhotons) {
             }
 
         }
-                
 
     }
+
+    delete[] list;
 
     // generate map
     map = new PhotonMap(photons, bound);
