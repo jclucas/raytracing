@@ -62,9 +62,9 @@ int main() {
     floor->read("resources/cornell/floor.ply");
     scene.add(*floor);
 
-    Sphere *sphere1 = new Sphere(glm::vec3(3.00, .65, 3.00), .65f, reflective);
+    Sphere *sphere1 = new Sphere(glm::vec3(4.0, 1.0, 4.0), 1.0f, reflective);
     scene.add(*sphere1);
-    Sphere *sphere2 = new Sphere(glm::vec3(2.00, .65, 2.00), .65f, transparent);
+    Sphere *sphere2 = new Sphere(glm::vec3(1.5, 1.0, 1.5), 1.0f, transparent);
     scene.add(*sphere2);
 
     // set up camera
