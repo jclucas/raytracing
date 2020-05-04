@@ -6,6 +6,7 @@
 #include "scene.h"
 #include "kd.h"
 #include "object.h"
+#include "material.h"
 #include "light.h"
 #include "photon.h"
 
@@ -116,7 +117,7 @@ void Scene::generatePhotonMap(int numPhotons) {
 
     // trace
     for (size_t i = 0; i < numPhotons; i++) {
-        list[i].pos = castMonteCarlo(list[i].pos, list[i].direction, 0);
+        list[i].pos = castMonteCarlo(list[i].pos, list[i].direction, 1);
         if (list[i].pos != glm::vec3(INFINITY, INFINITY, INFINITY)) {
             photons->push_back(&list[i]);
             bound.expand(list[i].pos);
@@ -178,7 +179,26 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
     if (hit.object == nullptr) {
         return background;
     } else {
-        color = hit.object->getColor(hit.point, origin, direction, *this, depth);
+
+        color = hit.object->getDirectIllumination(hit.point, origin, direction, *this, depth);
+
+        // recursive call
+        if (depth < MAX_DEPTH) {
+
+            // reflection
+            if (hit.object->isReflective()) {
+                Ray reflect = hit.object->reflect(hit.point, direction);
+                color += (hit.object->material->getProbSpecular()) * getPixel(reflect.origin, reflect.direction, depth + 1);
+            }
+
+            // transmission
+            if (hit.object->isTransmissive()) {
+                Ray refract = hit.object->refract(hit.point, direction);
+                color += hit.object->material->getProbTransmit() * getPixel(refract.origin, refract.direction, depth + 1);
+
+            }
+
+        }
     }
 
     // sample photon map for global illumination

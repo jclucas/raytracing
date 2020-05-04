@@ -20,6 +20,15 @@ class Primitive;
 // for recursive rays
 #define MAX_DEPTH 5
 
+class Ray {
+
+    public:
+        glm::vec3 origin;
+        glm::vec3 direction;
+        Ray(glm::vec3 origin, glm::vec3 direction);
+
+};
+
 /**
  * Abstract object class.
  */
@@ -28,11 +37,11 @@ class Object {
     protected:
         glm::vec3 position;
         BoundingBox bound;
-        Material *material;
         glm::mat4 invWorldMatrix = glm::mat4(1);
         virtual void setBounds() = 0;
 
     public:
+        Material *material;
         glm::vec3 getPosition();
         BoundingBox& getBounds();
         glm::vec3 inverseTransform(glm::vec3 p);
@@ -49,8 +58,12 @@ class Primitive : public Object {
     public:
         virtual float intersect(glm::vec3 origin, glm::vec3 direction) = 0;
         virtual bool intersect(BoundingBox& bounds) = 0;
+        bool isReflective();
+        bool isTransmissive();
         virtual glm::vec3 getNormal(glm::vec3 point) = 0;
-        glm::vec3 getColor(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene, int depth);
+        Ray reflect(glm::vec3 p, glm::vec3 direction);
+        Ray refract(glm::vec3 p, glm::vec3 direction);
+        glm::vec3 getDirectIllumination(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene, int depth);
         glm::vec3 bounce(glm::vec3 point, glm::vec3 direction, Scene& scene, int depth);
         glm::vec3 getDiffuse(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, glm::vec3 radiance);
         virtual vector<Primitive*>* getPrimitives() override;
