@@ -14,6 +14,8 @@ using namespace std;
 
 #define PI 3.141592f
 
+#define NUM_PHOTONS 1000
+
 typedef struct Hit {
     Primitive *object;
     glm::vec3 point;

@@ -236,7 +236,7 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
             Photon* p;
             size_t count = 0;
 
-            while (!heap->empty() && count < 50) {
+            while (!heap->empty() && count < NUM_PHOTONS / 100) {
                 p = heap->top();
                 flux += p->power;
                 heap->pop();

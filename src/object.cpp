@@ -168,17 +168,11 @@ void Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Sce
         power = material->scaleTransmit(photon.power);
         prob = material->getProbTransmit();
 
-    } else{
+    } // else absoption
 
-        // absoption
-
-    }
-
-    // Photon out = Photon();
     photon.pos = ray.origin;
     photon.direction = ray.direction;
     photon.power = power / prob;
-    // return out;
 
 }
 
