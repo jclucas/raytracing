@@ -117,11 +117,32 @@ void Scene::generatePhotonMap(int numPhotons) {
 
     // trace
     for (size_t i = 0; i < numPhotons; i++) {
-        list[i].pos = castMonteCarlo(list[i].pos, list[i].direction, 1);
-        if (list[i].pos != glm::vec3(INFINITY, INFINITY, INFINITY)) {
-            photons->push_back(&list[i]);
-            bound.expand(list[i].pos);
+        
+        for (size_t depth = 0; depth < MAX_DEPTH; depth++) {
+        
+            Hit hit = cast(list[i].pos, list[i].direction);
+
+            if (hit.object == nullptr) {
+                continue;
+            } else {
+                Ray r = hit.object->bounce(hit.point, list[i].direction, *this);
+
+                if (r.direction == glm::vec3(0)) {
+                    continue;
+                }
+
+                list[i].pos = r.origin;
+                list[i].direction = r.direction;
+                // list[i].power = hit.object->material->getDiffuse(r.origin, hit.object->getNormal(r.origin), r.direction, list[i].power);
+
+                photons->push_back(new Photon(list[i]));
+                bound.expand(list[i].pos);
+
+            }
+
         }
+                
+
     }
 
     // generate map
@@ -172,7 +193,7 @@ Hit Scene::cast(glm::vec3 origin, glm::vec3 direction) {
  */
 glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
     
-    glm::vec3 color;
+    glm::vec3 color = glm::vec3(0);
     Hit hit = cast(origin, direction);
     
     // direct & specular
@@ -199,6 +220,7 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
             }
 
         }
+
     }
 
     // sample photon map for global illumination
@@ -228,20 +250,5 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
         }
 
     return color;
-
-}
-
-/**
- * @return position of photon following ray
- */
-glm::vec3 Scene::castMonteCarlo(glm::vec3 origin, glm::vec3 direction, int depth) {
-    
-    Hit hit = cast(origin, direction);
-    
-    if (hit.object == nullptr) {
-        return glm::vec3(INFINITY, INFINITY, INFINITY);
-    } else {
-        return hit.object->bounce(hit.point, direction, *this, depth);
-    }
 
 }

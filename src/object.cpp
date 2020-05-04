@@ -104,7 +104,6 @@ glm::vec3 Primitive::getDirectIllumination(glm::vec3 point, glm::vec3 origin, gl
         Hit shadow = scene.cast(point + D_N * n, s);
         float dist = glm::length((*i)->getPosition() - point);
 
-        // TODO: encapsulation
         if (shadow.object != nullptr && shadow.object->material->getProbTransmit() > 0.0f) {
             glm::vec3 r = glm::reflect(-s, n);
             color += shadow.object->material->getProbTransmit() * material->getDiffuse(objPoint, n, s, (*i)->getRadiance(point));
@@ -135,15 +134,11 @@ inline glm::mat3 getCoordinateTransform(glm::vec3 n) {
 
 }
 
-glm::vec3 Primitive::bounce(glm::vec3 point, glm::vec3 direction, Scene& scene, int depth) {
+Ray Primitive::bounce(glm::vec3 point, glm::vec3 direction, Scene& scene) {
 
     float test = scene.dist(scene.random);
     glm::vec3 n = getNormal(point);
     glm::vec3 v = glm::normalize(-direction);
-
-    if (depth >= MAX_DEPTH) {
-        return point;
-    }
 
     if (test < material->getProbDiffuse()) {
 
@@ -152,24 +147,22 @@ glm::vec3 Primitive::bounce(glm::vec3 point, glm::vec3 direction, Scene& scene, 
         float theta = acos(scene.dist(scene.random));
         glm::vec3 dir = glm::vec3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
         glm::mat3 transform = glm::inverse(getCoordinateTransform(n));
-        return scene.castMonteCarlo(point, transform * dir, depth + 1);
+        return Ray(point, transform * dir);
 
     } else if (test < material->getProbDiffuse() + material->getProbSpecular()) {
 
         // specular reflection
-        glm::vec3 reflect = glm::reflect(-v, n);
-        return scene.castMonteCarlo(point, reflect, depth + 1);
+        return reflect(point, direction);
 
     } else if (test < material->getProbDiffuse() + material->getProbSpecular() + material->getProbTransmit()) {
         
         // transmission
-        Ray refract = this->refract(point, direction);
-        return scene.castMonteCarlo(refract.origin, refract.direction, depth + 1);
+        return refract(point, direction);
 
     } else{
 
         // absoption
-        return glm::vec3(INFINITY, INFINITY, INFINITY);
+        return Ray(glm::vec3(0), glm::vec3(0));
 
     }
 

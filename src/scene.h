@@ -39,7 +39,6 @@ class Scene {
         void add(Object& object);
         Hit cast(glm::vec3 origin, glm::vec3 direction);
         glm::vec3 getPixel(glm::vec3 origin, glm::vec3 direction, int depth);
-        glm::vec3 castMonteCarlo(glm::vec3 origin, glm::vec3 direction, int depth);
 
         // ?
         std::mt19937 random = std::mt19937();
