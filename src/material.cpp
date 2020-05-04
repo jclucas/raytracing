@@ -1,4 +1,5 @@
 #include <glm/geometric.hpp>
+#include <glm/gtc/constants.hpp>
 
 #include "material.h"
 #include "light.h"
@@ -122,7 +123,7 @@ glm::vec3 Phong::getDiffuse(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 rad
 
     }
 
-    return radiance * (diffuse * glm::max(glm::dot(s, n), 0.0f));
+    return radiance * (diffuse * glm::one_over_pi<float>() * glm::max(glm::dot(s, n), 0.0f));
 
 }
 
@@ -136,5 +137,5 @@ glm::vec3 Phong::getDiffuse(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 rad
  * @return intensity at point
  */
 glm::vec3 Phong::getSpecular(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 r, glm::vec3 v, glm::vec3 radiance) {
-    return radiance * specular * powf(glm::max(glm::dot(r, v), 0.0f), sharpness);
+    return radiance * specular * ((sharpness + 2) / glm::two_pi<float>()) * powf(glm::max(glm::dot(r, v), 0.0f), sharpness);
 }
