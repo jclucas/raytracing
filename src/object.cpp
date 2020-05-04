@@ -122,10 +122,18 @@ glm::vec3 Primitive::getDirectIllumination(glm::vec3 point, glm::vec3 origin, gl
 inline glm::mat3 getCoordinateTransform(glm::vec3 n) {
 
     glm::mat3 m;
-    glm::vec3 u = glm::normalize(glm::cross(glm::vec3(1, 0, 0), n));
+    glm::vec3 u;
+    
+    // get a vector in the plane defined by n
+    if (fabs(n.x) > fabs(n.y)) {
+        u = glm::normalize(glm::vec3(n.z, 0, -n.x));
+    } else {
+        u = glm::normalize(glm::vec3(0, -n.z, n.y));
+    }
+
     glm::vec3 v = glm::cross(n, u);
 
-    // transform matrix
+    // transformation matrix
     m = glm::mat3(u.x, n.x, v.x,
                   u.y, n.y, v.y,
                   u.z, n.z, v.z);
@@ -147,8 +155,9 @@ void Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Sce
 
         // diffuse reflection
         float phi = scene.dist(scene.random) * 2 * PI;
-        float theta = acos(scene.dist(scene.random));
-        glm::vec3 dir = glm::vec3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
+        float sinTheta = sqrt(scene.dist(scene.random));
+        float cosTheta = sqrt(1 - sinTheta * sinTheta);
+        glm::vec3 dir = glm::vec3(sinTheta * cos(phi), cosTheta, sinTheta * sin(phi));
         glm::mat3 transform = glm::inverse(getCoordinateTransform(n));
         ray = Ray(point, transform * dir);
         power = material->scaleDiffuse(photon.power);
