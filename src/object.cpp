@@ -134,11 +134,14 @@ inline glm::mat3 getCoordinateTransform(glm::vec3 n) {
 
 }
 
-Ray Primitive::bounce(glm::vec3 point, glm::vec3 direction, Scene& scene) {
+Photon* Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Scene& scene) {
 
     float test = scene.dist(scene.random);
     glm::vec3 n = getNormal(point);
     glm::vec3 v = glm::normalize(-direction);
+    Ray ray = Ray(glm::vec3(0), glm::vec3(0));
+    glm::vec3 power = glm::vec3(0);
+    float prob = 0;
 
     if (test < material->getProbDiffuse()) {
 
@@ -147,24 +150,35 @@ Ray Primitive::bounce(glm::vec3 point, glm::vec3 direction, Scene& scene) {
         float theta = acos(scene.dist(scene.random));
         glm::vec3 dir = glm::vec3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
         glm::mat3 transform = glm::inverse(getCoordinateTransform(n));
-        return Ray(point, transform * dir);
+        ray = Ray(point, transform * dir);
+        power = material->scaleDiffuse(photon.power);
+        prob = material->getProbDiffuse();
 
     } else if (test < material->getProbDiffuse() + material->getProbSpecular()) {
 
         // specular reflection
-        return reflect(point, direction);
+        ray = reflect(point, direction);
+        power = material->scaleSpecular(photon.power);
+        prob = material->getProbSpecular();
 
     } else if (test < material->getProbDiffuse() + material->getProbSpecular() + material->getProbTransmit()) {
         
         // transmission
-        return refract(point, direction);
+        ray = refract(point, direction);        
+        power = material->scaleTransmit(photon.power);
+        prob = material->getProbTransmit();
 
     } else{
 
         // absoption
-        return Ray(glm::vec3(0), glm::vec3(0));
 
     }
+
+    Photon* out = new Photon();
+    out->pos = ray.origin;
+    out->direction = ray.direction;
+    out->power = power / prob;
+    return out;
 
 }
 

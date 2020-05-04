@@ -6,10 +6,12 @@
 #include <glm/mat4x4.hpp>
 
 #include "bounding.h"
+#include "photon.h"
 
 class Material;
 class Scene;
 class Primitive;
+class Photon;
 
 // for floating point equality cutoffs
 #define EPSILON 0.00001f
@@ -64,7 +66,7 @@ class Primitive : public Object {
         Ray reflect(glm::vec3 p, glm::vec3 direction);
         Ray refract(glm::vec3 p, glm::vec3 direction);
         glm::vec3 getDirectIllumination(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene, int depth);
-        Ray bounce(glm::vec3 point, glm::vec3 direction, Scene& scene);
+        Photon* bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Scene& scene);
         glm::vec3 getDiffuse(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, glm::vec3 radiance);
         virtual vector<Primitive*>* getPrimitives() override;
 

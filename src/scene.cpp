@@ -111,7 +111,6 @@ void Scene::generatePhotonMap(int numPhotons) {
         count += toGenerate[i];
     }
 
-    // TODO: not this
     vector<Photon*>* photons = new vector<Photon*>();
     BoundingBox bound = BoundingBox();
 
@@ -126,18 +125,14 @@ void Scene::generatePhotonMap(int numPhotons) {
                 continue;
             } else if (depth >= 1) {
                 
-                Ray r = hit.object->bounce(hit.point, list[i].direction, *this);
+                Photon* p = hit.object->bounce(list[i], hit.point, list[i].direction, *this);
 
-                if (r.direction == glm::vec3(0)) {
+                if (p->direction == glm::vec3(0)) {
                     continue;
                 }
-
-                list[i].pos = r.origin;
-                list[i].direction = r.direction;
-                // list[i].power = hit.object->material->getDiffuse(r.origin, hit.object->getNormal(r.origin), r.direction, list[i].power);
-
-                photons->push_back(new Photon(list[i]));
-                bound.expand(list[i].pos);
+                
+                photons->push_back(p);
+                bound.expand(p->pos);
 
             }
 

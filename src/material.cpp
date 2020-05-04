@@ -25,6 +25,19 @@ float Material::getProbTransmit() {
     return probTransmit;
 }
 
+
+glm::vec3 Material::scaleDiffuse(glm::vec3 incident) {
+    return incident * diffuse;
+}
+
+glm::vec3 Material::scaleSpecular(glm::vec3 incident) {
+    return incident * specular;
+}
+
+glm::vec3 Material::scaleTransmit(glm::vec3 incident) {
+    return incident * transmittance;
+}
+
 /**
  * Return index of refraction.
  */

@@ -18,6 +18,9 @@ class Material {
         float getProbDiffuse();
         float getProbSpecular();
         float getProbTransmit();
+        glm::vec3 scaleDiffuse(glm::vec3 incident);
+        glm::vec3 scaleSpecular(glm::vec3 incident);
+        glm::vec3 scaleTransmit(glm::vec3 incident);
         float getIOR();
         void setIOR(float k);
         virtual glm::vec3 getDiffuse(glm::vec3 p, glm::vec3 n, glm::vec3 s, glm::vec3 radiance) = 0;
