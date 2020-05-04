@@ -142,7 +142,10 @@ inline glm::mat3 getCoordinateTransform(glm::vec3 n) {
 
 }
 
-void Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Scene& scene) {
+/**
+ * @return true if photon should be stored
+ */
+bool Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Scene& scene) {
 
     float test = scene.dist(scene.random);
     glm::vec3 n = getNormal(point);
@@ -150,6 +153,7 @@ void Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Sce
     Ray ray = Ray(glm::vec3(0), glm::vec3(0));
     glm::vec3 power = glm::vec3(0);
     float prob = 0;
+    bool store = false;
 
     if (test < material->getProbDiffuse()) {
 
@@ -162,6 +166,7 @@ void Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Sce
         ray = Ray(point, transform * dir);
         power = material->scaleDiffuse(photon.power);
         prob = material->getProbDiffuse();
+        store = true;
 
     } else if (test < material->getProbDiffuse() + material->getProbSpecular()) {
 
@@ -182,6 +187,7 @@ void Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Sce
     photon.pos = ray.origin;
     photon.direction = ray.direction;
     photon.power = power / prob;
+    return store;
 
 }
 

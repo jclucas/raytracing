@@ -31,7 +31,7 @@ int main() {
     Phong *green = new Phong(glm::vec3(0, 1.0f, 0), glm::vec3(0), 1);
     Phong *red = new Phong(glm::vec3(1.0f, 0, 0), glm::vec3(0), 1);
     Phong *reflective = new Phong(glm::vec3(0.8f), glm::vec3(1), 10.0f);
-    Phong *transparent = new Phong(glm::vec3(0.1f), glm::vec3(0.1f), 2.0f, glm::vec3(0.8), 0.95f);
+    Phong *transparent = new Phong(glm::vec3(0.1f), glm::vec3(0.1f), 2.0f, glm::vec3(0.8), 1.5f);
 
     // add lights
     Scene scene = Scene(BACKGROUND);

@@ -66,7 +66,7 @@ class Primitive : public Object {
         Ray reflect(glm::vec3 p, glm::vec3 direction);
         Ray refract(glm::vec3 p, glm::vec3 direction);
         glm::vec3 getDirectIllumination(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene, int depth);
-        void bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Scene& scene);
+        bool bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Scene& scene);
         glm::vec3 getDiffuse(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, glm::vec3 radiance);
         virtual vector<Primitive*>* getPrimitives() override;
 

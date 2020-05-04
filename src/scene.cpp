@@ -127,13 +127,13 @@ void Scene::generatePhotonMap(int numPhotons) {
                 continue;
             } else {
                 
-                hit.object->bounce(p, hit.point, p.direction, *this);
+                bool store = hit.object->bounce(p, hit.point, p.direction, *this);
 
                 if (p.direction == glm::vec3(0)) {
                     continue;
                 }
 
-                if (depth >= 1) {
+                if (store && depth >= 1) {
                     photons->push_back(new Photon(p));
                     bound.expand(p.pos);
                 }
@@ -225,30 +225,30 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
     }
 
     // sample photon map for global illumination
-        minheap* heap = new minheap(MinSquaredDist(hit.point), vector<Photon*>());
-        float RADIUS = 0.25f;
-        map->locatePhotons(hit.point, RADIUS, heap);
+    minheap* heap = new minheap(MinSquaredDist(hit.point), vector<Photon*>());
+    float RADIUS = 0.25f;
+    map->locatePhotons(hit.point, RADIUS, heap);
 
-        if (heap->size() > 0) {
-            
-            // estimate radiance
-            glm::vec3 flux = glm::vec3(0);
-            Photon* p;
-            size_t count = 0;
+    if (heap->size() > 0) {
+        
+        // estimate radiance
+        glm::vec3 flux = glm::vec3(0);
+        Photon* p;
+        size_t count = 0;
 
-            while (!heap->empty() && count < NUM_PHOTONS / 100) {
-                p = heap->top();
-                flux += p->power;
-                heap->pop();
-                count++;
-            }
-
-            glm::vec3 radiance = flux / (PI * RADIUS * RADIUS);
-
-            // add to pixel
-            color += hit.object->getDiffuse(hit.point, origin, direction, radiance);
-
+        while (!heap->empty() && count < NUM_PHOTONS / 100) {
+            p = heap->top();
+            flux += p->power;
+            heap->pop();
+            count++;
         }
+
+        glm::vec3 radiance = flux / (PI * RADIUS * RADIUS);
+
+        // add to pixel
+        color += hit.object->getDiffuse(hit.point, origin, direction, radiance);
+
+    }
 
     return color;
 
