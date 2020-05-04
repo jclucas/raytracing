@@ -16,8 +16,10 @@ glm::vec3 Light::getPosition() {
     return position;
 }
 
-glm::vec3 Light::getRadiance() {
-    return color * intensity;
+glm::vec3 Light::getRadiance(glm::vec3 point) {
+    glm::vec3 radiance = color * intensity;
+    float sqdist = glm::dot(position - point, position - point);
+    return (sqdist < 1) ? radiance : radiance / sqdist;
 }
 
 float Light::getIntensity() {
@@ -28,7 +30,7 @@ float Light::getIntensity() {
 void Light::spawnPhotons(int numPhotons, Photon buffer[]) {
 
     int count = 0;
-    float power = this->intensity / (float) numPhotons;
+    glm::vec3 power = this->color * this->intensity / (float) numPhotons;
     float x, y, z;
 
     while (count < numPhotons) {
@@ -41,7 +43,7 @@ void Light::spawnPhotons(int numPhotons, Photon buffer[]) {
 
         buffer[count].direction = glm::normalize(glm::vec3(x, y, z));
         buffer[count].pos = this->position;
-        buffer[count].power = this->color * power;
+        buffer[count].power = power;
 
         count++;
 

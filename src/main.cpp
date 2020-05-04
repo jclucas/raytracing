@@ -24,7 +24,7 @@ int main() {
     const std::string FILENAME = "cornell.ppm";
 
     // scene characteristics
-    const glm::vec3 BACKGROUND = glm::vec3(0.1f);
+    const glm::vec3 BACKGROUND = glm::vec3(0.0f);
 
     // create materials
     Phong *white = new Phong(glm::vec3(1.0f), glm::vec3(0), 1);
@@ -35,7 +35,7 @@ int main() {
 
     // add lights
     Scene scene = Scene(BACKGROUND);
-    Light *light = new Light(glm::vec3(280.0f, 548.7f, 279.5f), glm::vec3(1), 1.0f);
+    Light *light = new Light(glm::vec3(2.800f, 5.400f, 2.795f), glm::vec3(1), 400.0f);
     scene.add(*light);
 
     //////////////////////////
@@ -62,13 +62,13 @@ int main() {
     floor->read("resources/cornell/floor.ply");
     scene.add(*floor);
 
-    Sphere *sphere1 = new Sphere(glm::vec3(300, 65, 300), 65.0f, reflective);
+    Sphere *sphere1 = new Sphere(glm::vec3(3.00, .65, 3.00), .65f, reflective);
     scene.add(*sphere1);
-    Sphere *sphere2 = new Sphere(glm::vec3(200, 65, 200), 65.0f, transparent);
+    Sphere *sphere2 = new Sphere(glm::vec3(2.00, .65, 2.00), .65f, transparent);
     scene.add(*sphere2);
 
     // set up camera
-    Camera camera = Camera(glm::vec3(278, 273, -800), glm::vec3(278, 273, 0), glm::vec3(0, 1, 0));
+    Camera camera = Camera(glm::vec3(2.78, 2.73, -8.00), glm::vec3(2.78, 2.73, 0), glm::vec3(0, 1, 0), new ReinhardModel);
 
     // start clock
     std::clock_t start = std::clock();

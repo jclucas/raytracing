@@ -19,7 +19,7 @@ class Light {
     public:
         Light(glm::vec3 position, glm::vec3 color, float intensity);
         glm::vec3 getPosition();
-        glm::vec3 getRadiance();
+        glm::vec3 getRadiance(glm::vec3 point);
         float getIntensity();
         virtual void transform(glm::mat4 m);
         void spawnPhotons(int numPhotons, Photon buffer[]);
