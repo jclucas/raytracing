@@ -1,7 +1,6 @@
-#include "photon.h"
+#include <glm/gtc/constants.hpp>
 
-// temp
-#include <iostream>
+#include "photon.h"
 
 /**
  * Recursively create a bounding hierarchy for a given set of primitives.
@@ -141,6 +140,41 @@ void PhotonMap::locatePhotons(glm::vec3 point, float radius, minheap* heap) {
         }
 
     }
+
+}
+
+glm::vec3 PhotonMap::sample(glm::vec3 point, float radius) {
+
+    // sample photon map for global illumination
+    minheap* heap = new minheap(MinSquaredDist(point), vector<Photon*>());
+    float sqRadius = radius * radius;
+    float ALPHA = 0.918f, BETA = 1.953f;
+    locatePhotons(point, sqRadius, heap);
+    glm::vec3 radiance = glm::vec3(0);
+
+    if (heap->size() > 0) {
+        
+        // estimate radiance
+        glm::vec3 flux = glm::vec3(0);
+        Photon* p;
+        size_t count = 0;
+        float w, sqdist;
+
+        while (!heap->empty() && count < SAMPLE_SIZE) {
+            p = heap->top();
+            sqdist = glm::dot(p->pos - point, p->pos - point);
+            w = ALPHA * (1.0 - ((1.0 - exp(-BETA * sqdist / (2.0 * sqRadius))) / (1.0 - exp(-BETA))));
+            flux += p->power * Material::getRGB(p->wavelength) * w;
+            heap->pop();
+            count++;
+        }
+
+        radiance = flux / (glm::pi<float>() * sqRadius);
+
+    }
+
+    delete heap;
+    return radiance;
 
 }
 

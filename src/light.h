@@ -23,5 +23,6 @@ class Light {
         float getIntensity();
         virtual void transform(glm::mat4 m);
         void spawnPhotons(int numPhotons, Photon buffer[]);
+        void spawnPhotons(int numPhotons, Photon buffer[], const bool env[]);
 
 };

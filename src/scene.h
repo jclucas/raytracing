@@ -8,15 +8,10 @@ class KDTree;
 class Object;
 class Primitive;
 class Light;
+class Photon;
 class PhotonMap;
 
 using namespace std;
-
-#define PI 3.141592f
-
-#define NUM_PHOTONS 50000
-
-#define SAMPLE_SIZE glm::clamp(NUM_PHOTONS / 50, 10, 500)
 
 typedef struct Hit {
     Primitive *object;
@@ -30,7 +25,7 @@ class Scene {
         vector<Object*> objects;
         glm::vec3 background;
         KDTree* tree;
-        PhotonMap* map;
+        PhotonMap* map, *causticmap;
 
     public:
         Scene(glm::vec3 background);
@@ -39,6 +34,7 @@ class Scene {
         void transform(glm::mat4 m);
         void generateTree(vector<Primitive*>* prims);
         void generatePhotonMap(int numPhotons);
+        vector<Photon*>* tracePhotons(Photon list[], size_t numPhotons);
         void add(Light& light);
         void add(Object& object);
         Hit cast(glm::vec3 origin, glm::vec3 direction);

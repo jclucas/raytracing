@@ -75,7 +75,7 @@ void Scene::generateTree(vector<Primitive*>* prims) {
     // generate tree
     tree = new KDTree(prims);
     double duration = std::difftime(std::clock(), start) / (double) CLOCKS_PER_SEC;
-    cout << "k-d tree generated after " << duration << " seconds." << endl;
+    std::cout << "k-d tree generated after " << duration << " seconds." << endl;
 
 }
 
@@ -93,28 +93,94 @@ void Scene::generatePhotonMap(int numPhotons) {
 
     // distribute photons by relative intensity
     int toGenerate[lights.size()] = {};
+    int toGenerateCaustic[lights.size()] = {};
     int remaining = numPhotons;
+    int remainingCaustic = numPhotons;
 
     for (size_t i = 0; i < lights.size() - 1; i++) {
         toGenerate[i] = numPhotons * (lights[i]->getIntensity() / total);
         remaining -= toGenerate[i];
+        toGenerateCaustic[i] = numPhotons * (lights[i]->getIntensity() / total);
+        remainingCaustic -= toGenerateCaustic[i];
     }
 
     toGenerate[lights.size() - 1] = remaining;
+    toGenerateCaustic[lights.size() - 1] = remainingCaustic;
 
     // generate photon list
     Photon* list = new Photon[numPhotons];
-    int count = 0;
+    Photon* caustic = new Photon[numPhotons];
+    int count = 0, countCaustic = 0;
+
+    // environment map
+    bool* env = new bool[18 * 36];
+    glm::vec3 dir;
+    Hit result;
 
     for (size_t i = 0; i < lights.size(); i++) {
+
+        // generate env map
+        for (int phi = 0; phi < 36; phi++) {
+            for (int theta = 0; theta < 18; theta++) {
+                dir = glm::vec3(sin(theta * 10) * cos(phi * 10), sin(theta * 10) * sin(phi * 10), cos(theta * 10));
+                result = cast(lights[i]->getPosition(), dir);
+                env[phi * 18 + theta] = (result.object != nullptr && (result.object->isReflective() || result.object->isTransmissive()));
+            }
+        }
+
+
+        // spawn photons
         lights[i]->spawnPhotons(toGenerate[i], &list[count]);
+        lights[i]->spawnPhotons(toGenerateCaustic[i], &caustic[countCaustic], env);
+        delete[] env;
         count += toGenerate[i];
+        countCaustic += toGenerateCaustic[i];
+
+        // TODO: may not generate caustic photons
+
     }
 
-    vector<Photon*>* photons = new vector<Photon*>();
-    BoundingBox bound = BoundingBox();
 
     // trace
+    vector<Photon*>* photons = tracePhotons(list, numPhotons);
+    BoundingBox bound = BoundingBox();
+    for (auto it = photons->begin(); it != photons->end(); it++) {
+        bound.expand((*it)->pos);
+    }
+
+    // trace caustic photons
+    vector<Photon*>* caustics = tracePhotons(caustic, numPhotons);
+    BoundingBox boundC = BoundingBox();
+    for (auto it = caustics->begin(); it != caustics->end(); it++) {
+        boundC.expand((*it)->pos);
+    }
+
+    delete[] list;
+    delete[] caustic;
+
+    // generate map
+    map = new PhotonMap(photons, bound);
+    causticmap = new PhotonMap(caustics, boundC);
+
+    // insert photons
+    for (auto it = photons->begin(); it != photons->end(); it++) {
+        map->insert((*it));
+    }
+
+    for (auto it = caustics->begin(); it != caustics->end(); it++) {
+        causticmap->insert((*it));
+    }
+
+    // report time
+    double duration = std::difftime(std::clock(), start) / (double) CLOCKS_PER_SEC;
+    std::cout << "photon map generated after " << duration << " seconds." << endl;
+
+}
+
+vector<Photon*>* Scene::tracePhotons(Photon list[], size_t numPhotons) {
+
+    vector<Photon*>* photons = new vector<Photon*>();
+
     for (size_t i = 0; i < numPhotons; i++) {
 
         Photon& p = list[i];
@@ -135,7 +201,6 @@ void Scene::generatePhotonMap(int numPhotons) {
 
                 if (store && depth >= 1) {
                     photons->push_back(new Photon(p));
-                    bound.expand(p.pos);
                 }
 
             }
@@ -144,19 +209,7 @@ void Scene::generatePhotonMap(int numPhotons) {
 
     }
 
-    delete[] list;
-
-    // generate map
-    map = new PhotonMap(photons, bound);
-
-    // insert photons
-    for (auto it = photons->begin(); it != photons->end(); it++) {
-        map->insert((*it));
-    }
-
-    // report time
-    double duration = std::difftime(std::clock(), start) / (double) CLOCKS_PER_SEC;
-    cout << "photon map generated after " << duration << " seconds." << endl;
+    return photons;
 
 }
 
@@ -202,59 +255,34 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
         return background;
     } else {
 
-        color = hit.object->getDirectIllumination(hit.point, origin, direction, *this);
+        // color = hit.object->getDirectIllumination(hit.point, origin, direction, *this);
 
-        // recursive call
-        if (depth < MAX_DEPTH) {
+        // // recursive call
+        // if (depth < MAX_DEPTH) {
 
-            // reflection
-            if (hit.object->isReflective()) {
-                Ray reflect = hit.object->reflect(hit.point, direction);
-                color += (hit.object->material->getProbSpecular()) * getPixel(reflect.origin, reflect.direction, depth + 1);
-            }
+        //     // reflection
+        //     if (hit.object->isReflective()) {
+        //         Ray reflect = hit.object->reflect(hit.point, direction);
+        //         color += (hit.object->material->getProbSpecular()) * getPixel(reflect.origin, reflect.direction, depth + 1);
+        //     }
 
-            // transmission
-            if (hit.object->isTransmissive()) {
-                Ray refract = hit.object->refract(hit.point, direction);
-                color += hit.object->material->getProbTransmit() * getPixel(refract.origin, refract.direction, depth + 1);
+        //     // transmission
+        //     if (hit.object->isTransmissive()) {
+        //         Ray refract = hit.object->refract(hit.point, direction);
+        //         color += hit.object->material->getProbTransmit() * getPixel(refract.origin, refract.direction, depth + 1);
 
-            }
+        //     }
 
-        }
-
-    }
-
-    // sample photon map for global illumination
-    minheap* heap = new minheap(MinSquaredDist(hit.point), vector<Photon*>());
-    float SQ_RADIUS = 0.25f;
-    map->locatePhotons(hit.point, SQ_RADIUS, heap);
-
-    if (heap->size() > 0) {
-        
-        // estimate radiance
-        glm::vec3 flux = glm::vec3(0);
-        Photon* p;
-        size_t count = 0;
-        float ALPHA = 0.918, BETA = 1.953;
-        float w, sqdist;
-
-        while (!heap->empty() && count < SAMPLE_SIZE) {
-            p = heap->top();
-            sqdist = glm::dot(p->pos - hit.point, p->pos - hit.point);
-            w = ALPHA * (1.0 - ((1.0 - exp(-BETA * sqdist / (2.0 * SQ_RADIUS))) / (1.0 - exp(-BETA))));
-            flux += p->power * Material::getRGB(p->wavelength);// * (1.0f - (glm::dot(p->pos - hit.point, p->pos - hit.point) / RADIUS));
-            heap->pop();
-            count++;
-        }
-
-        glm::vec3 radiance = flux / (PI * SQ_RADIUS);
-
-        // add to pixel
-        color += hit.object->getDiffuse(hit.point, origin, direction, radiance);
+        // }
 
     }
+    
+    // global photon map
+    // color += hit.object->getDiffuse(hit.point, origin, direction, map->sample(hit.point, 0.5f));
+    
+    // caustic photon map
+    color += hit.object->getDiffuse(hit.point, origin, direction, causticmap->sample(hit.point, 0.1f));
 
-    delete heap;
     return color;
 
 }
