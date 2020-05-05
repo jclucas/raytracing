@@ -33,7 +33,7 @@ class Scene {
         vector<Primitive*>* getPrimitives();
         void transform(glm::mat4 m);
         void generateTree(vector<Primitive*>* prims);
-        void generatePhotonMap(int numPhotons);
+        void generatePhotonMap();
         vector<Photon*>* tracePhotons(Photon list[], size_t numPhotons);
         void add(Light& light);
         void add(Object& object);
