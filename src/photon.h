@@ -8,8 +8,9 @@
 #include "object.h"
 
 struct Photon {
+    float power;
+    float wavelength;
     glm::vec3 pos;
-    glm::vec3 power;
     glm::vec3 direction;
 };
 

@@ -17,7 +17,7 @@ class Photon;
 #define EPSILON 0.00001f
 
 // fraction of normal to move away from surfaces
-#define D_N 0.1f
+#define D_N 0.001f
 
 // for recursive rays
 #define MAX_DEPTH 5
@@ -64,8 +64,8 @@ class Primitive : public Object {
         bool isTransmissive();
         virtual glm::vec3 getNormal(glm::vec3 point) = 0;
         Ray reflect(glm::vec3 p, glm::vec3 direction);
-        Ray refract(glm::vec3 p, glm::vec3 direction);
-        glm::vec3 getDirectIllumination(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene, int depth);
+        Ray refract(glm::vec3 p, glm::vec3 direction, float wavelength = 0);
+        glm::vec3 getDirectIllumination(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene);
         bool bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Scene& scene);
         glm::vec3 getDiffuse(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, glm::vec3 radiance);
         virtual vector<Primitive*>* getPrimitives() override;

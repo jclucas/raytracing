@@ -5,6 +5,28 @@
 #include "light.h"
 #include "texture.h"
 
+glm::vec3 Material::getRGB(float wavelength) {
+
+    if (wavelength < 380.0 || wavelength > 780.0) {
+        return glm::vec3(0);
+    } else if(wavelength < 440.0) {
+        return glm::vec3(-1.0 * (wavelength - 440.0) / (440.0 - 380.0), 0.0, 1.0);
+    } else if (wavelength < 490.0) {
+        return glm::vec3(0.0, (wavelength - 440.0) / (490.0 - 440.0), 1.0);
+    } else if (wavelength < 510.0) {
+        return glm::vec3(0.0, 1.0, -1.0 * (wavelength - 510.0) / (510.0 - 490.0));
+    } else if (wavelength < 580.0) {
+        return glm::vec3((wavelength - 510.0) / (580.0 - 510.0), 1.0, 0.0);
+    } else if (wavelength < 645.0) {
+        return glm::vec3(1.0, -1.0 * (wavelength - 645.0) / (645.0 - 580.0), 0.0);
+    } else if (wavelength < 780.0) {
+        return glm::vec3(1.0, 0.0, 0.0);
+    } else {
+        return glm::vec3(0);
+    }
+
+}
+
 /**
  * Return coefficient of diffuse reflectance.
  */
@@ -27,30 +49,31 @@ float Material::getProbTransmit() {
 }
 
 
-glm::vec3 Material::scaleDiffuse(glm::vec3 incident) {
-    return incident * diffuse;
+float Material::scaleDiffuse(const Photon& incident) {
+    return incident.power * glm::dot(getRGB(incident.wavelength), diffuse);
 }
 
-glm::vec3 Material::scaleSpecular(glm::vec3 incident) {
-    return incident * specular;
+float Material::scaleSpecular(const Photon& incident) {
+    return incident.power * glm::dot(getRGB(incident.wavelength), specular);
 }
 
-glm::vec3 Material::scaleTransmit(glm::vec3 incident) {
-    return incident * transmittance;
+float Material::scaleTransmit(const Photon& incident) {
+    return incident.power * glm::dot(getRGB(incident.wavelength), transmittance);
 }
 
 /**
  * Return index of refraction.
  */
-float Material::getIOR() {
-    return ior;
-}
+float Material::getIOR(float wavelength) {
 
-/** 
- * Set index of refraction.
- */
-void Material::setIOR(float k) {
-    this->ior = k;
+    // non-spectral shortcut
+    if (wavelength == 0.0f) {
+        return ior;
+    }
+
+    // add dispersion coefficient
+    return ior + (wavelength - 589.3) * disp;
+
 }
 
 /**
@@ -82,11 +105,12 @@ void Material::normalizeProbabilities() {
  * @param specular reflectance of specular illumination
  * @param sharpness specular exponent
  */
-Phong::Phong(glm::vec3 diffuse, glm::vec3 specular, float sharpness, glm::vec3 transmit, float ior) {
+Phong::Phong(glm::vec3 diffuse, glm::vec3 specular, float sharpness, glm::vec3 transmit, float ior, float disp) {
     this->diffuse = diffuse;
     this->specular = specular;
     this->transmittance = transmit;
     this->ior = ior;
+    this->disp = disp;
     this->sharpness = sharpness;
     this->textures = nullptr;
     normalizeProbabilities();

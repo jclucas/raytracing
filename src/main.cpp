@@ -31,11 +31,13 @@ int main() {
     Phong *green = new Phong(glm::vec3(0, 1.0f, 0), glm::vec3(0), 1);
     Phong *red = new Phong(glm::vec3(1.0f, 0, 0), glm::vec3(0), 1);
     Phong *reflective = new Phong(glm::vec3(0.8f), glm::vec3(1), 10.0f);
-    Phong *transparent = new Phong(glm::vec3(0.1f), glm::vec3(0.1f), 2.0f, glm::vec3(0.8), 1.5f);
+    Phong *transparent = new Phong(glm::vec3(0.05f), glm::vec3(0.05f), 2.0f, glm::vec3(0.9), 1.5f, 0.005);
+    // Phong *transparent = new Phong(glm::vec3(0.0f), glm::vec3(0.0f), 2.0f, glm::vec3(1), 1.5f, 0.005);
 
     // add lights
     Scene scene = Scene(BACKGROUND);
-    Light *light = new Light(glm::vec3(2.8f, 5.488f, 2.795f), glm::vec3(1), 20.0f);
+    Light *light = new Light(glm::vec3(5.5f, 4.0f, 5.5f), glm::vec3(1), 20.0f);
+    // Light *light = new Light(glm::vec3(2.8f, 5.488f, 2.795f), glm::vec3(1), 20.0f);
     scene.add(*light);
 
     //////////////////////////
@@ -43,7 +45,7 @@ int main() {
     //////////////////////////
     
     Mesh *ceil = new Mesh(glm::vec3(0), glm::vec3(0), glm::vec3(1), white);
-    ceil->read("resources/cornell/ceiling_hole.ply");
+    ceil->read("resources/cornell/ceiling.ply");
     scene.add(*ceil);
     
     Mesh *leftwall = new Mesh(glm::vec3(0), glm::vec3(0), glm::vec3(1), red);
@@ -62,12 +64,17 @@ int main() {
     floor->read("resources/cornell/floor.ply");
     scene.add(*floor);
 
-    Sphere *sphere1 = new Sphere(glm::vec3(4.0, 1.0, 4.0), 1.0f, reflective);
-    scene.add(*sphere1);
-    Sphere *sphere2 = new Sphere(glm::vec3(1.5, 1.0, 1.5), 1.0f, transparent);
-    scene.add(*sphere2);
+    Mesh *prism = new Mesh(glm::vec3(4.0, 2.502, 4.0), glm::vec3(0, .6, 0), glm::vec3(1, 2.5, .5), transparent);
+    prism->read("resources/prism.ply");
+    scene.add(*prism);
+
+    // Sphere *sphere1 = new Sphere(glm::vec3(4.0, 1.0, 4.0), 1.0f, reflective);
+    // scene.add(*sphere1);
+    // Sphere *sphere2 = new Sphere(glm::vec3(1.5, 1.0, 1.5), 1.0f, transparent);
+    // scene.add(*sphere2);
 
     // set up camera
+    // Camera camera = Camera(glm::vec3(2.78, 2.73, -8.00), glm::vec3(2.78, 2.73, 0), glm::vec3(0, 1, 0), new ReinhardModel);
     Camera camera = Camera(glm::vec3(2.78, 2.73, -8.00), glm::vec3(2.78, 2.73, 0), glm::vec3(0, 1, 0), new ReinhardModel);
 
     // start clock
