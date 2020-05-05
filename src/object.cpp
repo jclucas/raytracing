@@ -158,7 +158,7 @@ bool Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Sce
     if (test < material->getProbDiffuse()) {
 
         // diffuse reflection
-        float phi = scene.dist(scene.random) * 2 * PI;
+        float phi = scene.dist(scene.random) * 2 * glm::pi<float>();
         float sinTheta = sqrt(scene.dist(scene.random));
         float cosTheta = sqrt(1 - sinTheta * sinTheta);
         glm::vec3 dir = glm::vec3(sinTheta * cos(phi), cosTheta, sinTheta * sin(phi));

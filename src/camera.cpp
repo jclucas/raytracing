@@ -5,6 +5,7 @@
 
 #include "scene.h"
 #include "camera.h"
+#include "photon.h"
 
 Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, ToneOperator* tone) {
 
