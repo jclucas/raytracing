@@ -2,6 +2,7 @@
 #include <ctime>
 #include <iostream>
 #include <glm/vec3.hpp>
+#include <glm/trigonometric.hpp>
 
 #include "scene.h"
 #include "kd.h"
@@ -79,7 +80,7 @@ void Scene::generateTree(vector<Primitive*>* prims) {
 
 }
 
-void Scene::generatePhotonMap(int numPhotons) {
+void Scene::generatePhotonMap() {
 
     // start clock
     std::clock_t start = std::clock();
@@ -94,22 +95,22 @@ void Scene::generatePhotonMap(int numPhotons) {
     // distribute photons by relative intensity
     int toGenerate[lights.size()] = {};
     int toGenerateCaustic[lights.size()] = {};
-    int remaining = numPhotons;
-    int remainingCaustic = numPhotons;
+    int remainingG = NUM_PHOTONS;
+    int remainingC = NUM_PHOTONS_CAUSTIC;
 
     for (size_t i = 0; i < lights.size() - 1; i++) {
-        toGenerate[i] = numPhotons * (lights[i]->getIntensity() / total);
-        remaining -= toGenerate[i];
-        toGenerateCaustic[i] = numPhotons * (lights[i]->getIntensity() / total);
-        remainingCaustic -= toGenerateCaustic[i];
+        toGenerate[i] = NUM_PHOTONS * (lights[i]->getIntensity() / total);
+        remainingG -= toGenerate[i];
+        toGenerateCaustic[i] = NUM_PHOTONS_CAUSTIC * (lights[i]->getIntensity() / total);
+        remainingC -= toGenerateCaustic[i];
     }
 
-    toGenerate[lights.size() - 1] = remaining;
-    toGenerateCaustic[lights.size() - 1] = remainingCaustic;
+    toGenerate[lights.size() - 1] = remainingG;
+    toGenerateCaustic[lights.size() - 1] = remainingC;
 
     // generate photon list
-    Photon* list = new Photon[numPhotons];
-    Photon* caustic = new Photon[numPhotons];
+    Photon* list = new Photon[NUM_PHOTONS];
+    Photon* caustic = new Photon[NUM_PHOTONS_CAUSTIC];
     int count = 0, countCaustic = 0;
 
     // environment map
@@ -121,11 +122,15 @@ void Scene::generatePhotonMap(int numPhotons) {
 
         // generate env map
         for (int phi = 0; phi < 36; phi++) {
+
             for (int theta = 0; theta < 18; theta++) {
-                dir = glm::vec3(sin(theta * 10) * cos(phi * 10), sin(theta * 10) * sin(phi * 10), cos(theta * 10));
+                float radT = glm::radians((float) theta * 10);
+                float radP = glm::radians((float) phi * 10);
+                dir = glm::vec3(sin(radT) * cos(radP), sin(radT) * sin(radP), cos(radT));
                 result = cast(lights[i]->getPosition(), dir);
                 env[phi * 18 + theta] = (result.object != nullptr && (result.object->isReflective() || result.object->isTransmissive()));
             }
+            
         }
 
 
@@ -142,14 +147,14 @@ void Scene::generatePhotonMap(int numPhotons) {
 
 
     // trace
-    vector<Photon*>* photons = tracePhotons(list, numPhotons);
+    vector<Photon*>* photons = tracePhotons(list, NUM_PHOTONS);
     BoundingBox bound = BoundingBox();
     for (auto it = photons->begin(); it != photons->end(); it++) {
         bound.expand((*it)->pos);
     }
 
     // trace caustic photons
-    vector<Photon*>* caustics = tracePhotons(caustic, numPhotons);
+    vector<Photon*>* caustics = tracePhotons(caustic, NUM_PHOTONS_CAUSTIC);
     BoundingBox boundC = BoundingBox();
     for (auto it = caustics->begin(); it != caustics->end(); it++) {
         boundC.expand((*it)->pos);
