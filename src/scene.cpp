@@ -235,10 +235,14 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
         glm::vec3 flux = glm::vec3(0);
         Photon* p;
         size_t count = 0;
+        float ALPHA = 0.918, BETA = 1.953;
+        float w, sqdist;
 
         while (!heap->empty() && count < SAMPLE_SIZE) {
             p = heap->top();
-            flux += p->power;// * (1.0f - (glm::dot(p->pos - hit.point, p->pos - hit.point) / RADIUS));
+            sqdist = glm::dot(p->pos - hit.point, p->pos - hit.point);
+            w = ALPHA * (1.0 - ((1.0 - exp(-BETA * sqdist / (2.0 * SQ_RADIUS))) / (1.0 - exp(-BETA))));
+            flux += p->power * w;// * (1.0f - (glm::dot(p->pos - hit.point, p->pos - hit.point) / RADIUS));
             heap->pop();
             count++;
         }

@@ -154,5 +154,5 @@ MinSquaredDist::MinSquaredDist(glm::vec3 target) {
 bool MinSquaredDist::operator() (const Photon* lhs, const Photon* rhs) {
     glm::vec3 ldiff = lhs->pos - target;
     glm::vec3 rdiff = rhs->pos - target;
-    return (glm::dot(ldiff, ldiff) < glm::dot(rdiff, rdiff));
+    return (glm::dot(ldiff, ldiff) > glm::dot(rdiff, rdiff));
 }
