@@ -226,8 +226,8 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
 
     // sample photon map for global illumination
     minheap* heap = new minheap(MinSquaredDist(hit.point), vector<Photon*>());
-    float RADIUS = 0.25f;
-    map->locatePhotons(hit.point, RADIUS, heap);
+    float SQ_RADIUS = 0.25f;
+    map->locatePhotons(hit.point, SQ_RADIUS, heap);
 
     if (heap->size() > 0) {
         
@@ -236,20 +236,21 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
         Photon* p;
         size_t count = 0;
 
-        while (!heap->empty() && count < NUM_PHOTONS / 100) {
+        while (!heap->empty() && count < SAMPLE_SIZE) {
             p = heap->top();
-            flux += p->power;
+            flux += p->power;// * (1.0f - (glm::dot(p->pos - hit.point, p->pos - hit.point) / RADIUS));
             heap->pop();
             count++;
         }
 
-        glm::vec3 radiance = flux / (PI * RADIUS * RADIUS);
+        glm::vec3 radiance = flux / (PI * SQ_RADIUS);
 
         // add to pixel
         color += hit.object->getDiffuse(hit.point, origin, direction, radiance);
 
     }
 
+    delete heap;
     return color;
 
 }

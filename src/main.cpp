@@ -35,7 +35,7 @@ int main() {
 
     // add lights
     Scene scene = Scene(BACKGROUND);
-    Light *light = new Light(glm::vec3(2.800f, 5.400f, 2.795f), glm::vec3(1), 10.0f);
+    Light *light = new Light(glm::vec3(2.8f, 5.488f, 2.795f), glm::vec3(1), 20.0f);
     scene.add(*light);
 
     //////////////////////////
@@ -43,7 +43,7 @@ int main() {
     //////////////////////////
     
     Mesh *ceil = new Mesh(glm::vec3(0), glm::vec3(0), glm::vec3(1), white);
-    ceil->read("resources/cornell/ceiling.ply");
+    ceil->read("resources/cornell/ceiling_hole.ply");
     scene.add(*ceil);
     
     Mesh *leftwall = new Mesh(glm::vec3(0), glm::vec3(0), glm::vec3(1), red);

@@ -14,7 +14,9 @@ using namespace std;
 
 #define PI 3.141592f
 
-#define NUM_PHOTONS 1000
+#define NUM_PHOTONS 50000
+
+#define SAMPLE_SIZE glm::clamp(NUM_PHOTONS / 50, 10, 500)
 
 typedef struct Hit {
     Primitive *object;
