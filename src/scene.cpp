@@ -202,7 +202,7 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
         return background;
     } else {
 
-        color = hit.object->getDirectIllumination(hit.point, origin, direction, *this, depth);
+        color = hit.object->getDirectIllumination(hit.point, origin, direction, *this);
 
         // recursive call
         if (depth < MAX_DEPTH) {
@@ -242,7 +242,7 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
             p = heap->top();
             sqdist = glm::dot(p->pos - hit.point, p->pos - hit.point);
             w = ALPHA * (1.0 - ((1.0 - exp(-BETA * sqdist / (2.0 * SQ_RADIUS))) / (1.0 - exp(-BETA))));
-            flux += p->power * w;// * (1.0f - (glm::dot(p->pos - hit.point, p->pos - hit.point) / RADIUS));
+            flux += p->power * Material::getRGB(p->wavelength);// * (1.0f - (glm::dot(p->pos - hit.point, p->pos - hit.point) / RADIUS));
             heap->pop();
             count++;
         }

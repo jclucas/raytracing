@@ -56,12 +56,12 @@ Ray Primitive::reflect(glm::vec3 p, glm::vec3 direction) {
 
 }
 
-Ray Primitive::refract(glm::vec3 p, glm::vec3 direction) {
+Ray Primitive::refract(glm::vec3 p, glm::vec3 direction, float wavelength) {
     
     glm::vec3 refract;
     glm::vec3 norm = getNormal(p);
     float dot = glm::dot(direction, norm);
-    float ratio = 1.0f / material->getIOR();
+    float ratio = 1.0f / material->getIOR(wavelength);
     
     // check if we are entering or exiting material
     if (dot > 0) {
@@ -83,7 +83,7 @@ Ray Primitive::refract(glm::vec3 p, glm::vec3 direction) {
 
 }
 
-glm::vec3 Primitive::getDirectIllumination(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene, int depth) {
+glm::vec3 Primitive::getDirectIllumination(glm::vec3 point, glm::vec3 origin, glm::vec3 direction, Scene& scene) {
 
     glm::vec3 color = glm::vec3(0);
 
@@ -151,7 +151,7 @@ bool Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Sce
     glm::vec3 n = getNormal(point);
     glm::vec3 v = glm::normalize(-direction);
     Ray ray = Ray(glm::vec3(0), glm::vec3(0));
-    glm::vec3 power = glm::vec3(0);
+    float power = 0;
     float prob = 0;
     bool store = false;
 
@@ -164,7 +164,7 @@ bool Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Sce
         glm::vec3 dir = glm::vec3(sinTheta * cos(phi), cosTheta, sinTheta * sin(phi));
         glm::mat3 transform = glm::inverse(getCoordinateTransform(n));
         ray = Ray(point, transform * dir);
-        power = material->scaleDiffuse(photon.power);
+        power = material->scaleDiffuse(photon);
         prob = material->getProbDiffuse();
         store = true;
 
@@ -172,14 +172,14 @@ bool Primitive::bounce(Photon& photon, glm::vec3 point, glm::vec3 direction, Sce
 
         // specular reflection
         ray = reflect(point, direction);
-        power = material->scaleSpecular(photon.power);
+        power = material->scaleSpecular(photon);
         prob = material->getProbSpecular();
 
     } else if (test < material->getProbDiffuse() + material->getProbSpecular() + material->getProbTransmit()) {
         
         // transmission
-        ray = refract(point, direction);        
-        power = material->scaleTransmit(photon.power);
+        ray = refract(point, direction, photon.wavelength); 
+        power = material->scaleTransmit(photon);
         prob = material->getProbTransmit();
 
     } // else absoption
