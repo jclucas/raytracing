@@ -8,13 +8,14 @@
 #include "object.h"
 #include "material.h"
 
-#define NUM_PHOTONS 1000
+#define NUM_PHOTONS 5000
 
-#define NUM_PHOTONS_CAUSTIC 10000
+#define NUM_PHOTONS_CAUSTIC 50000
 
 #define SAMPLE_SIZE glm::clamp(NUM_PHOTONS / 100, 10, 500)
 
-#define SAMPLE_SIZE_CAUSTIC glm::clamp(NUM_PHOTONS_CAUSTIC / 100, 10, 500)
+#define SAMPLE_SIZE_CAUSTIC 100
+// #define SAMPLE_SIZE_CAUSTIC glm::clamp(NUM_PHOTONS_CAUSTIC / 100, 50, 500)
 
 struct Photon {
     float power;
@@ -52,6 +53,6 @@ class PhotonMap {
         PhotonMap(vector<Photon*>* list, BoundingBox bound);
         void insert(Photon* obj);
         void locatePhotons(glm::vec3 point, float radius, minheap* heap);
-        glm::vec3 sample(glm::vec3 point, float radius);
+        glm::vec3 sample(glm::vec3 point, float radius, int size);
 
 };

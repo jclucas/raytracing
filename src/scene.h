@@ -34,7 +34,7 @@ class Scene {
         void transform(glm::mat4 m);
         void generateTree(vector<Primitive*>* prims);
         void generatePhotonMap();
-        vector<Photon*>* tracePhotons(Photon list[], size_t numPhotons);
+        vector<Photon*>* tracePhotons(Photon list[], size_t numPhotons, bool reflectDiffuse = true);
         void add(Light& light);
         void add(Object& object);
         Hit cast(glm::vec3 origin, glm::vec3 direction);

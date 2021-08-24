@@ -98,11 +98,11 @@ glm::vec3 Primitive::getDirectIllumination(glm::vec3 point, glm::vec3 origin, gl
     // direct lighting, iterate through lights
     for (vector<Light*>::iterator i = lights.begin(); i != lights.end(); i++) {
 
-        glm::vec3 s = glm::normalize((*i)->getPosition() - point);
+        glm::vec3 s = -(*i)->getDirection(point);//glm::normalize((*i)->getPosition() - point);
 
         // cast shadow vector
         Hit shadow = scene.cast(point + D_N * n, s);
-        float dist = glm::length((*i)->getPosition() - point);
+        float dist = (*i)->getDistance(point);//glm::length((*i)->getPosition() - point);
 
         if (shadow.object != nullptr && shadow.object->material->getProbTransmit() > 0.0f) {
             glm::vec3 r = glm::reflect(-s, n);

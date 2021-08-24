@@ -17,6 +17,14 @@ glm::vec3 Light::getPosition() {
     return position;
 }
 
+glm::vec3 Light::getDirection(glm::vec3 point) {
+    return glm::normalize(point - position);
+}
+
+float Light::getDistance(glm::vec3 point) {
+    return distance(position, point);
+}
+
 glm::vec3 Light::getRadiance(glm::vec3 point) {
     glm::vec3 radiance = color * intensity;
     float sqdist = glm::dot(position - point, position - point);
@@ -63,14 +71,14 @@ void Light::spawnPhotons(int numPhotons, Photon buffer[], const bool env[]) {
     float angle = 0.0;
 
     // get solid angle
-    for (int i = 0; i < 18 * 36; i ++) {
+    for (int i = 0; i < 180 * 360; i ++) {
         if (env[i]) angle++;
     }
 
     // nothing to generate
     if (angle == 0.0) return;
 
-    angle /= (18 * 36);
+    angle /= (180 * 360);
 
     int index;
     float phi, theta, dp, dt;
@@ -80,14 +88,14 @@ void Light::spawnPhotons(int numPhotons, Photon buffer[], const bool env[]) {
 
         // pick a section
         do {
-            index = (int) floor(dist(random) * 18 * 36);
+            index = (int) floor(dist(random) * 180 * 360);
         } while (!env[index]);
 
         // pick direction within section
-        dp = dist(random) * 10.0f;
-        dt = dist(random) * 10.0f;
-        phi = glm::radians((float) (index / 18) * 10.0 + dp);
-        theta = glm::radians((float) (index % 18) * 10.0 + dt);
+        dp = dist(random);// * 10.0f - 5.0f;
+        dt = dist(random);// * 10.0f - 5.0f;
+        phi = glm::radians((float) (index / 180) + dp);
+        theta = glm::radians((float) (index % 180) + dt);
         
         dir = glm::vec3(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 

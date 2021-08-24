@@ -7,3 +7,5 @@ out
 *.o
 *.obj
 *.exe
+/*.png
+/*.ppm

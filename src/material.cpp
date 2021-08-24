@@ -72,7 +72,7 @@ float Material::getIOR(float wavelength) {
     }
 
     // add dispersion coefficient
-    return ior + (wavelength - 589.3) * disp;
+    return ior - (wavelength - 589.3f) * disp;
 
 }
 

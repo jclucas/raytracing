@@ -19,9 +19,9 @@ using namespace std;
 int main() {
 
     // output properties
-    const int HEIGHT = 720;
-    const int WIDTH = 720;
-    const std::string FILENAME = "cornell.ppm";
+    const int HEIGHT = 600;
+    const int WIDTH = 800;
+    const std::string FILENAME = "cornell2.ppm";
 
     // scene characteristics
     const glm::vec3 BACKGROUND = glm::vec3(0.0f);
@@ -36,8 +36,8 @@ int main() {
 
     // add lights
     Scene scene = Scene(BACKGROUND);
-    Light *light = new Light(glm::vec3(5.5f, 4.0f, 5.5f), glm::vec3(1), 20.0f);
-    // Light *light = new Light(glm::vec3(2.8f, 5.488f, 2.795f), glm::vec3(1), 20.0f);
+    // Light *light = new Light(glm::vec3(20.0f, 11.0f, 20.0f), glm::vec3(1), 80.0f);
+    Light *light = new Light(glm::vec3(2.8f, 5.488f, 2.795f), glm::vec3(1), 20.0f);
     scene.add(*light);
 
     //////////////////////////
@@ -45,10 +45,10 @@ int main() {
     //////////////////////////
     
     Mesh *ceil = new Mesh(glm::vec3(0), glm::vec3(0), glm::vec3(1), white);
-    ceil->read("resources/cornell/ceiling.ply");
+    ceil->read("resources/cornell/ceiling_hole.ply");
     scene.add(*ceil);
     
-    Mesh *leftwall = new Mesh(glm::vec3(0), glm::vec3(0), glm::vec3(1), red);
+    Mesh *leftwall = new Mesh(glm::vec3(0), glm::vec3(0), glm::vec3(1), white);
     leftwall->read("resources/cornell/leftwall.ply");
     scene.add(*leftwall);
 
@@ -56,7 +56,7 @@ int main() {
     backwall->read("resources/cornell/backwall.ply");
     scene.add(*backwall);
         
-    Mesh *rightwall = new Mesh(glm::vec3(0), glm::vec3(0), glm::vec3(1), green);
+    Mesh *rightwall = new Mesh(glm::vec3(0), glm::vec3(0), glm::vec3(1), white);
     rightwall->read("resources/cornell/rightwall.ply");
     scene.add(*rightwall);
 
@@ -64,18 +64,23 @@ int main() {
     floor->read("resources/cornell/floor.ply");
     scene.add(*floor);
 
-    Mesh *prism = new Mesh(glm::vec3(4.0, 2.502, 4.0), glm::vec3(0, .6, 0), glm::vec3(1, 2.5, .5), transparent);
+    // Mesh *prism = new Mesh(glm::vec3(4.0, 2.502, 4.0), glm::vec3(0, .6, 0), glm::vec3(1, 2.5, .5), transparent);
+    Mesh *prism = new Mesh(glm::vec3(2.75, 3.0, 3.5), glm::vec3(0.4, 0 , glm::radians(90.0f)), glm::vec3(.5, 1.5, .5), transparent);
     prism->read("resources/prism.ply");
     scene.add(*prism);
 
-    // Sphere *sphere1 = new Sphere(glm::vec3(4.0, 1.0, 4.0), 1.0f, reflective);
+    // Mesh *bunny = new Mesh(glm::vec3(2.5f, 1.0f, 3.0f), glm::vec3(0, glm::radians(180.0f), 0), glm::vec3(20), transparent);
+    // bunny->read("resources/bun_zipper_res4.ply");
+    // scene.add(*bunny);
+
+    // Sphere *sphere1 = new Sphere(glm::vec3(4.0, 2.0, 2.5), 1.5f, transparent);
     // scene.add(*sphere1);
-    // Sphere *sphere2 = new Sphere(glm::vec3(1.5, 1.0, 1.5), 1.0f, transparent);
+    // Sphere *sphere2 = new Sphere(glm::vec3(1.5, 3.0, 4.0), 1.0f, transparent);
     // scene.add(*sphere2);
 
     // set up camera
-    // Camera camera = Camera(glm::vec3(2.78, 2.73, -8.00), glm::vec3(2.78, 2.73, 0), glm::vec3(0, 1, 0), new ReinhardModel);
     Camera camera = Camera(glm::vec3(2.78, 2.73, -8.00), glm::vec3(2.78, 2.73, 0), glm::vec3(0, 1, 0), new ReinhardModel);
+    // Camera camera = Camera(glm::vec3(2.78, 3.73, -3.00), glm::vec3(2.78, 2.0, 0), glm::vec3(0, 1, 0), new ReinhardModel);
 
     // start clock
     std::clock_t start = std::clock();

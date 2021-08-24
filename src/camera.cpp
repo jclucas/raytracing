@@ -24,7 +24,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 lookat, glm::vec3 up, ToneOperator*
 
     // hardcoded parameters for now
     this->fov = glm::radians(30.0f);
-    this->length = 0.035f;
+    this->length = 0.055f;
 
 }
 
@@ -54,7 +54,7 @@ glm::vec3* Camera::render(size_t height, size_t width, Scene scene) {
     // define film plane
     glm::vec3 center = glm::vec3(0, 0, length);
     // float w = glm::tan(fov) * length;
-    float h = 0.025f;
+    float h = 0.035f;
 
     // amount to step in camera space between pixels
     float step = -h / height;

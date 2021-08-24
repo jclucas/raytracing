@@ -41,7 +41,6 @@ void Scene::transform(glm::mat4 m) {
 
     for (vector<Light*>::iterator i = lights.begin(); i != lights.end(); i++) {
         (*i)->transform(m);
-        glm::vec3 pos = (*i)->getPosition();
     }
 
 }
@@ -114,21 +113,21 @@ void Scene::generatePhotonMap() {
     int count = 0, countCaustic = 0;
 
     // environment map
-    bool* env = new bool[18 * 36];
+    bool* env = new bool[180 * 360];
     glm::vec3 dir;
     Hit result;
 
     for (size_t i = 0; i < lights.size(); i++) {
 
         // generate env map
-        for (int phi = 0; phi < 36; phi++) {
+        for (int phi = 0; phi < 360; phi++) {
 
-            for (int theta = 0; theta < 18; theta++) {
-                float radT = glm::radians((float) theta * 10);
-                float radP = glm::radians((float) phi * 10);
+            for (int theta = 0; theta < 180; theta++) {
+                float radT = glm::radians((float) theta);
+                float radP = glm::radians((float) phi);
                 dir = glm::vec3(sin(radT) * cos(radP), sin(radT) * sin(radP), cos(radT));
                 result = cast(lights[i]->getPosition(), dir);
-                env[phi * 18 + theta] = (result.object != nullptr && (result.object->isReflective() || result.object->isTransmissive()));
+                env[phi * 180 + theta] = (result.object != nullptr && (result.object->isReflective() || result.object->isTransmissive()));
             }
             
         }
@@ -154,7 +153,7 @@ void Scene::generatePhotonMap() {
     }
 
     // trace caustic photons
-    vector<Photon*>* caustics = tracePhotons(caustic, NUM_PHOTONS_CAUSTIC);
+    vector<Photon*>* caustics = tracePhotons(caustic, NUM_PHOTONS_CAUSTIC, false);
     BoundingBox boundC = BoundingBox();
     for (auto it = caustics->begin(); it != caustics->end(); it++) {
         boundC.expand((*it)->pos);
@@ -182,7 +181,7 @@ void Scene::generatePhotonMap() {
 
 }
 
-vector<Photon*>* Scene::tracePhotons(Photon list[], size_t numPhotons) {
+vector<Photon*>* Scene::tracePhotons(Photon list[], size_t numPhotons, bool reflectDiffuse) {
 
     vector<Photon*>* photons = new vector<Photon*>();
 
@@ -195,17 +194,18 @@ vector<Photon*>* Scene::tracePhotons(Photon list[], size_t numPhotons) {
             Hit hit = cast(p.pos, p.direction);
 
             if (hit.object == nullptr) {
-                continue;
+                break;
             } else {
                 
                 bool store = hit.object->bounce(p, hit.point, p.direction, *this);
 
                 if (p.direction == glm::vec3(0)) {
-                    continue;
+                    break;
                 }
 
-                if (store && depth >= 1) {
+                if (store) {
                     photons->push_back(new Photon(p));
+                    if (!reflectDiffuse) break;
                 }
 
             }
@@ -260,33 +260,36 @@ glm::vec3 Scene::getPixel(glm::vec3 origin, glm::vec3 direction, int depth) {
         return background;
     } else {
 
-        // color = hit.object->getDirectIllumination(hit.point, origin, direction, *this);
+        color = hit.object->getDirectIllumination(hit.point, origin, direction, *this);
 
-        // // recursive call
-        // if (depth < MAX_DEPTH) {
+        // recursive call
+        if (depth < MAX_DEPTH) {
 
-        //     // reflection
-        //     if (hit.object->isReflective()) {
-        //         Ray reflect = hit.object->reflect(hit.point, direction);
-        //         color += (hit.object->material->getProbSpecular()) * getPixel(reflect.origin, reflect.direction, depth + 1);
-        //     }
+            // reflection
+            if (hit.object->isReflective()) {
+                Ray reflect = hit.object->reflect(hit.point, direction);
+                color += (hit.object->material->getProbSpecular()) * getPixel(reflect.origin, reflect.direction, depth + 1);
+            }
 
-        //     // transmission
-        //     if (hit.object->isTransmissive()) {
-        //         Ray refract = hit.object->refract(hit.point, direction);
-        //         color += hit.object->material->getProbTransmit() * getPixel(refract.origin, refract.direction, depth + 1);
+            // transmission
+            if (hit.object->isTransmissive()) {
+                Ray refract = hit.object->refract(hit.point, direction);
+                color += hit.object->material->getProbTransmit() * getPixel(refract.origin, refract.direction, depth + 1);
 
-        //     }
+            }
 
-        // }
+        }
 
     }
     
     // global photon map
-    // color += hit.object->getDiffuse(hit.point, origin, direction, map->sample(hit.point, 0.5f));
-    
+    // color += hit.object->getDiffuse(hit.point, origin, direction, map->sample(hit.point, 0.5f, SAMPLE_SIZE));
+    color += hit.object->getDiffuse(hit.point, origin, hit.object->getNormal(hit.point), map->sample(hit.point, 0.5f, 2 * SAMPLE_SIZE));
+    // color += map->sample(hit.point, 0.50f, SAMPLE_SIZE);
+
     // caustic photon map
-    color += hit.object->getDiffuse(hit.point, origin, direction, causticmap->sample(hit.point, 0.1f));
+    // color += hit.object->getDiffuse(hit.point, origin, -hit.object->getNormal(hit.point), causticmap->sample(hit.point, 0.1f, SAMPLE_SIZE_CAUSTIC));
+    color += causticmap->sample(hit.point, 0.25f, 2 * SAMPLE_SIZE_CAUSTIC);
 
     return color;
 
